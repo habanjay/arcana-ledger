@@ -1,7 +1,7 @@
 # 🪄 Arcana Ledger
 *A fantasy‑inspired trading, analytics, and portfolio‑tracking dashboard.*
 
-Arcana Ledger blends modern market tooling with a cohesive arcane‑themed aesthetic. Built with **React, Vite, and Tailwind CSS**, it showcases clean UI/UX design, component‑driven architecture, and thoughtful product branding. This project serves as both a **personal tool** and a **portfolio piece** demonstrating frontend engineering, state management, and thematic product design.
+Arcana Ledger blends modern market tooling with a cohesive arcane‑themed aesthetic. Built with **React, Vite, and Bootstrap CSS**, it showcases clean UI/UX design, component‑driven architecture, and thoughtful product branding. This project serves as both a **personal tool** and a **portfolio piece** demonstrating frontend engineering, state management, and thematic product design.
 
 ---
 
@@ -20,7 +20,7 @@ Arcana Ledger blends modern market tooling with a cohesive arcane‑themed aesth
   A cohesive fantasy aesthetic inspired by arcana, runes, and mystical knowledge.
 
 - **⚡ Modern Frontend Stack**  
-  React + Vite + Tailwind CSS for fast development and smooth UX.
+  React + Vite + Bootstrap CSS for fast development and smooth UX.
 
 ---
 
@@ -29,7 +29,7 @@ Arcana Ledger blends modern market tooling with a cohesive arcane‑themed aesth
 | Category | Tools |
 |---------|--------|
 | Frontend Framework | React (Vite) |
-| Styling | Tailwind CSS |
+| Styling | Bootstrap CSS |
 | State Management | TBD (Context, Zustand, Redux, etc.) |
 | Data Visualization | TBD (Recharts, Chart.js, etc.) |
 | API Integration | Fetch / Axios |

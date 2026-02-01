@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/ArcanaLedger.AppHost/ArcanaLedger.AppHost.csproj" />
+    <Project Path="src/ArcanaLedger.ServiceDefaults/ArcanaLedger.ServiceDefaults.csproj" />
+    <Project Path="src/ArcanaPortfolio.API/ArcanaPortfolio.API.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+</Solution>
