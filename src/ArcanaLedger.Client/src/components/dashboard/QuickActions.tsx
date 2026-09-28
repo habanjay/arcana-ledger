@@ -1,5 +1,5 @@
-import { quickActions } from '../data/dashboardData';
-import { SectionHeading } from './SectionHeading';
+import { quickActions } from '../../data/dashboardData';
+import { SectionHeading } from '../layout/SectionHeading';
 
 interface QuickActionsProps { actionMessage: string; onAction: (label: string) => void; }
 

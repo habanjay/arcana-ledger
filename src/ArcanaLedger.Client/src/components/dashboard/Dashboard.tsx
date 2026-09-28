@@ -1,21 +1,21 @@
 import { useState } from 'react';
-import { activity, navigationItems, watchlist } from '../data/dashboardData';
+import { activity, navigationItems, watchlist } from '../../data/dashboardData';
 import { ActivityFeed } from './ActivityFeed';
-import { NavigationRail } from './NavigationRail';
+import { NavigationRail } from '../layout/NavigationRail';
 import { PerformanceChart } from './PerformanceChart';
 import { QuickActions } from './QuickActions';
-import { SectionHeading } from './SectionHeading';
-import { TopBar } from './TopBar';
+import { SectionHeading } from '../layout/SectionHeading';
+import { TopBar } from '../layout/TopBar';
 import { Watchlist } from './Watchlist';
 
-export function Dashboard() {
+export function Dashboard({ onNavigate }: { onNavigate?: (label: string) => void }) {
   const [railExpanded, setRailExpanded] = useState(false);
   const [selectedSymbol, setSelectedSymbol] = useState('AAPL');
   const [actionMessage, setActionMessage] = useState('');
   const showAction = (label: string) => { setActionMessage(`${label} selected`); window.setTimeout(() => setActionMessage(''), 1200); };
 
   return <div className={railExpanded ? 'app nav-expanded' : 'app'}>
-    <NavigationRail items={navigationItems} expanded={railExpanded} onToggle={() => setRailExpanded((current) => !current)} />
+    <NavigationRail items={navigationItems} activeLabel="Home" expanded={railExpanded} onToggle={() => setRailExpanded((current) => !current)} onNavigate={onNavigate} />
     <main className="workspace">
       <TopBar />
       <section className="home" aria-label="Trading home overview">

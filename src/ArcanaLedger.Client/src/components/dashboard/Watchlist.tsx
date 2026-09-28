@@ -1,5 +1,5 @@
-import type { WatchlistItem } from '../types/dashboard';
-import { SectionHeading } from './SectionHeading';
+import type { WatchlistItem } from '../../types/dashboard';
+import { SectionHeading } from '../layout/SectionHeading';
 
 interface WatchlistProps { items: WatchlistItem[]; selectedSymbol: string; onSelect: (symbol: string) => void; }
 
