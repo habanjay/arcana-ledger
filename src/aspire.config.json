@@ -1,0 +1,5 @@
+{
+  "appHost": {
+    "path": "ArcanaLedger.AppHost/ArcanaLedger.AppHost.csproj"
+  }
+}
