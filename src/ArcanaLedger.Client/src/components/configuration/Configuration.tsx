@@ -1,0 +1,34 @@
+import { useState, type ChangeEvent } from 'react';
+import { configurationDefaults, optionGroups, portfolioFields, positionSections, swingSections } from '../../data/configurationData';
+import type { ConfigurationField, ConfigurationOptionGroup, ConfigurationSection, ConfigurationValues } from '../../types/configuration';
+import { NavigationRail } from '../layout/NavigationRail';
+import { TopBar } from '../layout/TopBar';
+
+interface ConfigurationProps { onNavigate: (label: string) => void; }
+
+function Field({ field, values, onChange }: { field: ConfigurationField; values: ConfigurationValues; onChange: (event: ChangeEvent<HTMLInputElement>) => void }) {
+  return <div className="field"><label htmlFor={`configuration-${field.key}`}>{field.label}</label><input id={`configuration-${field.key}`} className={field.tone ? `input-${field.tone}` : undefined} value={values[field.key]} onChange={onChange} /></div>;
+}
+
+function FormSection({ section, values, onChange, showDivider }: { section: ConfigurationSection; values: ConfigurationValues; onChange: (event: ChangeEvent<HTMLInputElement>) => void; showDivider?: boolean }) {
+  return <div className={showDivider ? 'configuration-subsection divided' : 'configuration-subsection'}><h3 className="section-title">{section.title}</h3><div className="form-grid">{section.fields.map((field) => <Field key={field.key} field={field} values={values} onChange={onChange} />)}</div></div>;
+}
+
+function PanelHeader({ title, subtitle, badge }: { title: string; subtitle: string; badge?: string }) {
+  return <div className="panel-head"><div><h2>{title}</h2><p>{subtitle}</p></div>{badge && <span className="panel-badge">{badge}</span>}</div>;
+}
+
+function OptionsPanel({ groups, selections, onSelect }: { groups: ConfigurationOptionGroup[]; selections: Record<string, string>; onSelect: (label: string, option: string) => void }) {
+  return <section className="panel control-panel"><h2>Setup Defaults</h2>{groups.map((group) => <div className="control-block" key={group.label}><span className="control-label">{group.label}</span><div className="options">{group.options.map((option) => <button className={selections[group.label] === option ? 'option selected' : 'option'} key={option} type="button" onClick={() => onSelect(group.label, option)}>{option}</button>)}</div></div>)}</section>;
+}
+
+export function Configuration({ onNavigate }: ConfigurationProps) {
+  const [values, setValues] = useState<ConfigurationValues>(configurationDefaults);
+  const [selections, setSelections] = useState<Record<string, string>>(() => Object.fromEntries(optionGroups.map((group) => [group.label, group.initial])));
+  const [saved, setSaved] = useState(false);
+  const updateValue = (event: ChangeEvent<HTMLInputElement>) => { setValues((current) => ({ ...current, [event.target.id.replace('configuration-', '')]: event.target.value } as ConfigurationValues)); setSaved(false); };
+  const reset = () => { setValues(configurationDefaults); setSelections(Object.fromEntries(optionGroups.map((group) => [group.label, group.initial]))); setSaved(false); };
+  const save = () => { setSaved(true); window.setTimeout(() => setSaved(false), 1400); };
+
+  return <div className="app"><NavigationRail activeLabel="Configuration" onNavigate={onNavigate} /><main className="workspace configuration-workspace"><TopBar title="Configuration" /><section className="configuration-content" aria-label="Trading configuration"><div className="page-heading"><div><h1>Trading Configuration</h1><p>Set portfolio risk, position sizing, and execution rules for your active setups.</p></div><div className="heading-actions"><button className="ghost" type="button" onClick={reset}>Reset Changes</button><button className="primary" type="button" onClick={save}>{saved ? 'Saved' : 'Save Configuration'}</button></div></div><div className="configuration-layout"><div className="column"><section className="panel"><PanelHeader title="Portfolio Risk" subtitle="Base capital and allocation limits" badge="Active" /><div className="panel-body"><div className="form-grid">{portfolioFields.map((field) => <Field key={field.key} field={field} values={values} onChange={updateValue} />)}</div><div className="divider" /><h3 className="section-title">Risk thresholds</h3><div className="rule-grid"><div className="rule green"><span>VAR @ 0.25%</span><strong>$640.26</strong></div><div className="rule red"><span>Max daily loss</span><strong>($803.48)</strong></div><div className="rule"><span>Position risk</span><strong>1.25 VAR</strong></div></div></div></section><section className="panel"><PanelHeader title="Position Trading" subtitle="Entry and exit rules for longer-hold positions" badge="2 Tranches" /><div className="panel-body">{positionSections.map((section, index) => <FormSection key={section.title} section={section} values={values} onChange={updateValue} showDivider={index > 0} />)}</div></section><section className="panel"><PanelHeader title="Execution Defaults" subtitle="Standard values used when creating a new trade" /><div className="panel-body"><div className="form-grid"><div className="field"><label htmlFor="order-type-default">Order type</label><select id="order-type-default" defaultValue="Long"><option>Long</option><option>Short</option><option>Sell</option><option>Cover</option></select></div><div className="field"><label htmlFor="trend-default">Trend</label><select id="trend-default" defaultValue="Up"><option>Up</option><option>Down</option></select></div></div></div></section></div><div className="column"><section className="panel summary"><h2>Configuration Snapshot</h2><p>Current portfolio allocation</p><div className="summary-value">{values.capital}<small>VAR capacity $640.26</small></div><div className="summary-line"><span>Capital at risk</span><strong>{values.varRate}</strong></div><div className="summary-line"><span>Available cash</span><strong>{values.cashValue}</strong></div></section><section className="panel"><PanelHeader title="Swing / Momentum" subtitle="Breakout and continuation setups" badge="Swing" /><div className="panel-body">{swingSections.map((section, index) => <FormSection key={section.title} section={section} values={values} onChange={updateValue} showDivider={index > 0} />)}</div></section><OptionsPanel groups={optionGroups} selections={selections} onSelect={(label, option) => setSelections((current) => ({ ...current, [label]: option }))} /><section className="panel control-panel"><h2>VAR Multipliers</h2><div className="var-list">{['0.25', '0.50', '0.75', '1.00', '1.25', '1.50', '1.75', '2.00'].map((value) => <div className="var-row" key={value}><span>{value}</span><strong>{Number(value)}</strong></div>)}</div><p className="footer-note">Last updated today at 9:42 AM</p></section></div></div></section></main></div>;
+}
