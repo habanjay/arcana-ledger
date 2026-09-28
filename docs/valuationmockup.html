@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Company Valuation</title>
+	<style>
+		:root { --bg:#211b30; --panel:#3b344b; --deep:#302941; --line:rgba(215,205,235,.22); --muted:#a69ab9; --text:#f8f5ff; --cyan:#43b8ff; --green:#16d99b; --red:#ff4d6d; }
+		* { box-sizing:border-box; }
+		body { margin:0; min-width:320px; color:var(--text); background:var(--bg); font:12px/1.4 "Segoe UI",Tahoma,sans-serif; }
+		button,input { font:inherit; } button { border:0; color:inherit; cursor:pointer; } button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible { outline:2px solid var(--cyan); outline-offset:3px; }
+		@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior:auto!important; transition-duration:.01ms!important; animation-duration:.01ms!important; } }
+		.app { display:flex; min-height:100vh; overflow:hidden; }
+		.rail { width:67px; flex:0 0 67px; border-right:1px solid rgba(255,255,255,.12); display:flex; flex-direction:column; align-items:center; padding:21px 11px 18px; }
+		.brand { width:31px; height:31px; margin:0 auto 42px; position:relative; }
+		.brand::before,.brand::after { content:""; position:absolute; width:24px; height:18px; transform:skewY(-29deg); }
+		.brand::before { top:0; left:0; background:#f05db8; } .brand::after { right:0; bottom:0; background:#a96be9; }
+		.nav { display:grid; gap:13px; width:100%; } .nav button,.logout { width:43px; height:42px; margin:auto; border-radius:10px; background:transparent; color:#a69ab9; font-size:19px; transition:.2s ease; }
+		.nav button:hover,.nav button.active { color:#fff; background:#3b304e; } .logout { margin-top:auto; font-size:18px; }
+		.workspace { flex:1; min-width:0; padding:0 20px 24px; } .topbar { height:74px; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:20px; }
+		.back { width:29px; height:29px; border-radius:50%; background:var(--deep); color:#bcb0d2; font-size:22px; line-height:25px; }
+		.page-title { text-align:center; font-weight:700; font-size:10px; } .top-actions { justify-self:end; display:flex; align-items:center; gap:17px; }
+		.search { width:149px; height:32px; display:flex; align-items:center; padding:0 10px 0 13px; border-radius:11px; background:var(--deep); color:#bcb0d2; }
+		.search input { width:100%; border:0; outline:0; color:#fff; background:transparent; font-size:10px; } .search span { font-size:18px; line-height:1; }
+		.icon-button { width:34px; height:34px; border-radius:50%; border:1px solid #655a75; background:transparent; color:#ddd5e9; font-size:17px; } .avatar { width:34px; height:34px; display:grid; place-items:center; border-radius:50%; background:#453b59; font-size:17px; }
+		.content { max-width:1080px; margin:0 auto; } .page-heading { display:flex; align-items:end; justify-content:space-between; gap:20px; margin:0 0 18px; }
+		h1 { margin:0; font-size:22px; line-height:1.1; } .page-heading p { margin:6px 0 0; color:var(--muted); font-size:10px; } .heading-actions { display:flex; gap:9px; }
+		.ghost,.save { padding:9px 14px; border-radius:7px; font-weight:700; } .ghost { background:var(--deep); color:#c7bdd5; } .save { background:linear-gradient(90deg,#ad65eb,#bd6ef1); }
+		.layout { display:grid; grid-template-columns:minmax(0,1.45fr) minmax(280px,.85fr); gap:14px; align-items:start; } .column { display:grid; gap:14px; min-width:0; }
+		.panel { border:1px solid var(--line); border-radius:15px; background:var(--panel); overflow:hidden; } .panel-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 15px; border-bottom:1px solid rgba(215,205,235,.14); }
+		.panel-head h2,.panel h2 { margin:0; font-size:13px; } .panel-head p { margin:3px 0 0; color:var(--muted); font-size:9px; } .panel-body { padding:14px 15px; }
+		.badge { padding:4px 8px; border-radius:5px; background:rgba(22,217,155,.13); color:var(--green); font-size:9px; font-weight:700; } .form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:13px 18px; }
+		.field { display:grid; gap:5px; } .field label { color:#b8adc8; font-size:9px; } .field input { width:100%; min-height:31px; border:1px solid #5d526e; border-radius:6px; padding:6px 9px; outline:0; color:#f7f2ff; background:var(--deep); }
+		.field input:focus { border-color:var(--cyan); } .input-positive { color:var(--green)!important; } .section-title { margin:0 0 11px; color:#ded6e9; font-size:10px; text-transform:uppercase; letter-spacing:.1em; }
+		.divider { height:1px; margin:17px 0; background:rgba(215,205,235,.12); } .forecast-wrap { overflow-x:auto; } .forecast { width:100%; min-width:600px; border-collapse:collapse; font-size:10px; }
+		.forecast th,.forecast td { padding:7px 8px; border-bottom:1px solid rgba(215,205,235,.15); text-align:right; white-space:nowrap; } .forecast th { color:#b8adc8; font-weight:700; background:#302a40; } .forecast th:first-child,.forecast td:first-child { color:#fff; text-align:left; font-weight:700; } .forecast tr:last-child td { border-bottom:0; }
+		.summary { padding:16px; background:linear-gradient(135deg,#24194c,#61377e 62%,#a24d77); position:relative; } .summary::after { content:""; position:absolute; width:100px; height:100px; right:-25px; bottom:-50px; border-radius:50%; background:var(--green); opacity:.55; } .summary>* { position:relative; z-index:1; }
+		.summary p { margin:4px 0 0; color:#d0c3dd; font-size:9px; } .summary-value { margin:18px 0; font-size:24px; font-weight:700; } .summary-value small { display:block; margin-top:3px; color:var(--green); font-size:10px; }
+		.summary-line { display:flex; justify-content:space-between; padding-top:9px; margin-top:9px; border-top:1px solid rgba(255,255,255,.2); color:#d0c3dd; font-size:9px; } .summary-line strong { color:#fff; font-size:11px; }
+		.control { padding:15px; } .control h2 { margin:0 0 14px; } .assumption-list { display:grid; gap:12px; } .assumption { display:grid; gap:6px; } .assumption label { color:#b8adc8; font-size:9px; } .assumption input { min-height:31px; border:1px solid #5d526e; border-radius:6px; padding:6px 9px; color:#fff; background:var(--deep); outline:0; } .assumption input:focus { border-color:var(--cyan); }
+		.metric-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:9px; } .metric { padding:11px; border-radius:8px; background:#332d43; } .metric span { color:#a79bb7; font-size:9px; } .metric strong { display:block; margin-top:7px; font-size:15px; } .positive { color:var(--green); } .negative { color:var(--red); }
+		.stock-list { display:grid; gap:7px; } .stock-button { display:grid; grid-template-columns:34px 1fr auto; align-items:center; gap:9px; width:100%; padding:9px; border:1px solid transparent; border-radius:8px; background:#332d43; text-align:left; } .stock-button:hover,.stock-button.selected { border-color:var(--cyan); background:rgba(67,184,255,.12); } .stock-symbol { display:grid; place-items:center; width:28px; height:28px; border-radius:8px; background:#453b59; color:#fff; font-size:9px; font-weight:700; } .stock-name { display:block; color:#eee8f5; font-size:10px; font-weight:700; } .stock-sector { display:block; margin-top:2px; color:#9186a3; font-size:8px; } .stock-price { color:var(--green); font-size:10px; font-weight:700; }
+		.note { margin:14px 0 0; color:#857a98; font-size:9px; text-align:right; } .status { display:flex; align-items:center; gap:7px; color:#c8bdd5; font-size:9px; } .status i { width:7px; height:7px; border-radius:50%; background:var(--green); }
+		@media (max-width:820px) { .layout { grid-template-columns:1fr; max-width:620px; margin:auto; } .summary { order:-1; } }
+		@media (max-width:560px) { .rail { width:54px; flex-basis:54px; padding-left:6px; padding-right:6px; } .workspace { padding:0 12px 18px; } .topbar { height:62px; grid-template-columns:auto 1fr auto; } .page-title,.icon-button { display:none; } .top-actions { gap:7px; } .search { width:106px; } .page-heading { align-items:start; flex-direction:column; } .heading-actions { width:100%; } .heading-actions button { flex:1; } .form-grid,.metric-grid { grid-template-columns:1fr; } }
+	</style>
+</head>
+<body>
+	<div class="app">
+		<aside class="rail"><div class="brand" aria-label="Trading logo"></div><nav class="nav" aria-label="Primary navigation"><button aria-label="Dashboard">⌂</button><button aria-label="Analytics">◔</button><button class="active" aria-label="Valuation">▣</button><button aria-label="Configuration">⚙</button></nav><button class="logout" aria-label="Log out">↪</button></aside>
+		<main class="workspace">
+			<header class="topbar"><button class="back" aria-label="Back">‹</button><div class="page-title">Valuation</div><div class="top-actions"><label class="search"><input type="search" placeholder="Search" aria-label="Search"><span>⌕</span></label><button class="icon-button" aria-label="Notifications">♧</button><div class="avatar" aria-label="Profile">🧑</div></div></header>
+			<section class="content" aria-label="Company valuation model">
+				<div class="page-heading"><div><h1>Company Valuation</h1><p>Estimate fair value from earnings growth, margins, and comparable multiples.</p></div><div class="heading-actions"><button class="ghost" id="reset">Reset Model</button><button class="save" id="save">Save Valuation</button></div></div>
+				<div class="layout">
+					<div class="column">
+						<section class="panel"><div class="panel-head"><div><h2 id="forecast-title">Operating Forecast - AAPL</h2><p>Historical results and projected earnings, in millions</p></div><span class="badge">5-Year Model</span></div><div class="panel-body"><div class="forecast-wrap"><table class="forecast"><thead><tr><th>Fiscal year</th><th>Y-1</th><th>Y0</th><th>Y+1E</th><th>Y+2E</th><th>Y+3E</th><th>Y+4E</th><th>Y+5E</th></tr></thead><tbody id="forecast-body"></tbody></table></div></div></section>
+						<section class="panel"><div class="panel-head"><div><h2>Valuation Summary</h2><p>Current market price compared with modeled fair value</p></div><div class="status"><i></i>Model ready</div></div><div class="panel-body"><div class="metric-grid"><div class="metric"><span>Price today</span><strong id="price-display">$47.00</strong></div><div class="metric"><span>Target price (Year +5)</span><strong class="positive" id="target-display">$69.41</strong></div><div class="metric"><span>Upside</span><strong class="positive" id="upside-display">47.7%</strong></div><div class="metric"><span>Implied EPS</span><strong id="eps-display">$3.31</strong></div></div><p class="note">Target price = estimated Year +5 EPS x comparable P/E.</p></div></section>
+					</div>
+					<div class="column">
+						<section class="panel summary"><h2>Valuation Snapshot</h2><p>Estimated fair value based on current assumptions</p><div class="summary-value" id="summary-target">$69.41<small id="summary-upside">+47.7% upside to price today</small></div><div class="summary-line"><span>Comparable P/E</span><strong id="summary-pe">21.00x</strong></div><div class="summary-line"><span>Discount rate</span><strong id="summary-rate">8.00%</strong></div></section>
+						<section class="panel control"><h2>Stocks</h2><div class="stock-list" id="stock-list" aria-label="Select a stock for valuation"></div></section>
+						<section class="panel control"><h2>Model Inputs</h2><div class="assumption-list"><div class="assumption"><label for="revenue">Estimated revenue (Y0), in millions</label><input id="revenue" type="number" value="124423" step="1"></div><div class="assumption"><label for="net-income">Estimated net income (Y0), in millions</label><input id="net-income" type="number" value="6105" step="1"></div><div class="assumption"><label for="shares">Outstanding shares, in millions</label><input id="shares" type="number" value="2765.40" step="0.01"></div><div class="assumption"><label for="growth">Revenue growth (5-year CAGR)</label><input id="growth" type="number" value="8" step="0.1"></div><div class="assumption"><label for="margin">Terminal net margin</label><input id="margin" type="number" value="5" step="0.1"></div><div class="assumption"><label for="multiple">Comparable P/E</label><input id="multiple" type="number" value="21" step="0.1"></div><div class="assumption"><label for="price">Price today</label><input id="price" type="number" value="47" step="0.01"></div></div></section>
+						<section class="panel control"><h2>Input Assumptions</h2><div class="metric-grid"><div class="metric"><span>Actual revenue</span><strong>$112,589M</strong></div><div class="metric"><span>Actual net income</span><strong>$5,526M</strong></div><div class="metric"><span>Current margin</span><strong>4.9%</strong></div><div class="metric"><span>Forecast period</span><strong>5 years</strong></div></div><p class="note">Last updated today at 9:42 AM</p></section>
+					</div>
+				</div>
+			</section>
+		</main>
+	</div>
+	<script>
+		const stocks = {
+			AAPL: { name:'Apple Inc.', sector:'Consumer technology', revenue:124423, netIncome:6105, shares:2765.40, growth:8, margin:5, multiple:21, price:47, y1Revenue:112589, y1Income:5526 },
+			MSFT: { name:'Microsoft Corp.', sector:'Software & cloud', revenue:245122, netIncome:88100, shares:7430, growth:11, margin:36, multiple:29, price:430, y1Revenue:211915, y1Income:72361 },
+			NVDA: { name:'NVIDIA Corp.', sector:'Semiconductors', revenue:130497, netIncome:72880, shares:24500, growth:28, margin:45, multiple:35, price:177, y1Revenue:60922, y1Income:29760 },
+			AMZN: { name:'Amazon.com Inc.', sector:'Commerce & cloud', revenue:637959, netIncome:59248, shares:10700, growth:12, margin:10, multiple:28, price:225, y1Revenue:574785, y1Income:30425 }
+		};
+		let selectedStock = 'AAPL';
+		const ids = ['revenue', 'net-income', 'shares', 'growth', 'margin', 'multiple', 'price'];
+		const defaults = { revenue:124423, 'net-income':6105, shares:2765.40, growth:8, margin:5, multiple:21, price:47 };
+		function renderForecast(stock) {
+			const revenue = [stock.y1Revenue, stock.revenue];
+			const income = [stock.y1Income, stock.netIncome];
+			for (let year = 1; year <= 5; year++) { revenue.push(revenue[year] * (1 + stock.growth / 100)); income.push(revenue[year] * stock.margin / 100); }
+			const growth = ['-', ((stock.revenue / stock.y1Revenue - 1) * 100).toFixed(1) + '%', ...Array(5).fill(stock.growth.toFixed(1) + '%')];
+			const margins = income.map((value, index) => (value / revenue[index] * 100).toFixed(1) + '%');
+			const eps = income.map(value => (value / stock.shares).toFixed(2));
+			const row = (label, values) => '<tr><td>' + label + '</td>' + values.map(value => '<td>' + (typeof value === 'number' ? Math.round(value).toLocaleString() : value) + '</td>').join('') + '</tr>';
+			document.getElementById('forecast-body').innerHTML = row('Revenue', revenue) + row('Net income', income) + row('Revenue growth', growth) + row('Net margin', margins) + row('EPS', eps);
+			document.getElementById('forecast-title').textContent = 'Operating Forecast - ' + selectedStock;
+		}
+		function loadStock(symbol) {
+			selectedStock = symbol;
+			const stock = stocks[symbol];
+			const values = { revenue:stock.revenue, 'net-income':stock.netIncome, shares:stock.shares, growth:stock.growth, margin:stock.margin, multiple:stock.multiple, price:stock.price };
+			ids.forEach(id => document.getElementById(id).value = values[id]);
+			document.querySelectorAll('.stock-button').forEach(button => button.classList.toggle('selected', button.dataset.symbol === symbol));
+			renderForecast(stock);
+			calculate();
+		}
+		function renderStocks() {
+			document.getElementById('stock-list').innerHTML = Object.entries(stocks).map(([symbol, stock]) => '<button class="stock-button" data-symbol="' + symbol + '"><span class="stock-symbol">' + symbol + '</span><span><span class="stock-name">' + stock.name + '</span><span class="stock-sector">' + stock.sector + '</span></span><span class="stock-price">$' + stock.price.toFixed(2) + '</span></button>').join('');
+			document.querySelectorAll('.stock-button').forEach(button => button.addEventListener('click', () => loadStock(button.dataset.symbol)));
+		}
+		function calculate() {
+			const values = Object.fromEntries(ids.map(id => [id, Number(document.getElementById(id).value) || 0]));
+			const futureRevenue = values.revenue * Math.pow(1 + values.growth / 100, 5);
+			const futureEps = futureRevenue * (values.margin / 100) / values.shares;
+			const target = futureEps * values.multiple;
+			const upside = values.price ? (target / values.price - 1) * 100 : 0;
+			document.getElementById('target-display').textContent = '$' + target.toFixed(2);
+			document.getElementById('summary-target').childNodes[0].nodeValue = '$' + target.toFixed(2);
+			document.getElementById('summary-upside').textContent = (upside >= 0 ? '+' : '') + upside.toFixed(1) + '% upside to price today';
+			document.getElementById('upside-display').textContent = upside.toFixed(1) + '%';
+			document.getElementById('eps-display').textContent = '$' + futureEps.toFixed(2);
+			document.getElementById('price-display').textContent = '$' + values.price.toFixed(2);
+			document.getElementById('summary-pe').textContent = values.multiple.toFixed(2) + 'x';
+			document.getElementById('summary-rate').textContent = '8.00%';
+		}
+		ids.forEach(id => document.getElementById(id).addEventListener('input', calculate));
+		document.getElementById('reset').addEventListener('click', () => { ids.forEach(id => document.getElementById(id).value = defaults[id]); calculate(); });
+		document.getElementById('save').addEventListener('click', event => { event.currentTarget.textContent = 'Saved'; setTimeout(() => event.currentTarget.textContent = 'Save Valuation', 1400); });
+		renderStocks();
+		loadStock(selectedStock);
+	</script>
+</body>
+</html>

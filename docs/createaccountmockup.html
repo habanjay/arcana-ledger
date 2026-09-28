@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Create Account | Trading Portfolio</title>
+	<style>
+		:root {
+			--bg: #211b30;
+			--panel: #3b344b;
+			--deep: #302941;
+			--line: rgba(215, 205, 235, .24);
+			--muted: #a69ab9;
+			--text: #f8f5ff;
+			--cyan: #43b8ff;
+			--green: #16d99b;
+		}
+
+		* { box-sizing: border-box; }
+		body { min-width: 320px; min-height: 100vh; margin: 0; color: var(--text); background: var(--bg); font: 12px/1.4 "Segoe UI", Tahoma, sans-serif; }
+		button, input { font: inherit; }
+		button { border: 0; color: inherit; cursor: pointer; }
+		button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+		@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto!important; transition-duration: .01ms!important; animation-duration: .01ms!important; } }
+		.page { min-height: 100vh; display: grid; place-items: center; padding: 28px; position: relative; overflow: hidden; }
+		.page::before, .page::after { content: ""; position: absolute; pointer-events: none; }
+		.page::before { width: 390px; height: 390px; left: -170px; bottom: -190px; border: 75px solid rgba(67, 184, 255, .08); border-radius: 50%; }
+		.page::after { width: 270px; height: 270px; right: -115px; top: -130px; border: 54px solid rgba(237, 54, 232, .09); border-radius: 50%; }
+		.shell { width: min(930px, 100%); min-height: 590px; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(340px, .95fr); position: relative; z-index: 1; border: 1px solid var(--line); border-radius: 18px; background: rgba(59, 52, 75, .92); box-shadow: 0 24px 70px rgba(10, 7, 19, .35); overflow: hidden; }
+		.brand-panel { display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; padding: 38px; background: linear-gradient(140deg, #24194c, #61377e 59%, #a24d77); }
+		.brand-panel::before { content: ""; position: absolute; width: 205px; height: 205px; right: -65px; bottom: -105px; border: 35px solid rgba(22, 217, 155, .65); border-radius: 50%; }
+		.brand-panel::after { content: ""; position: absolute; width: 92px; height: 92px; right: 54px; top: 72px; border: 22px solid rgba(67, 184, 255, .5); border-radius: 50%; }
+		.brand-content, .brand-footer { position: relative; z-index: 1; }
+		.logo { width: 42px; height: 42px; position: relative; margin-bottom: 72px; }
+		.logo::before, .logo::after { content: ""; position: absolute; width: 33px; height: 25px; transform: skewY(-29deg); }
+		.logo::before { top: 0; left: 0; background: #f05db8; }
+		.logo::after { right: 0; bottom: 0; background: #a96be9; }
+		.eyebrow { margin: 0 0 12px; color: #e6d7f1; font-size: 9px; letter-spacing: .16em; font-weight: 700; }
+		h1 { max-width: 370px; margin: 0 0 15px; font-size: clamp(30px, 4vw, 43px); line-height: 1.05; }
+		.brand-copy { max-width: 310px; margin: 0; color: #ded2e9; font-size: 12px; }
+		.brand-footer { display: flex; align-items: center; gap: 9px; color: #ded2e9; font-size: 10px; }
+		.brand-footer i { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 4px rgba(22, 217, 155, .16); }
+		.form-panel { display: flex; flex-direction: column; justify-content: center; padding: 40px 52px; background: var(--panel); }
+		.form-panel h2 { margin: 0 0 6px; font-size: 22px; }
+		.form-intro { margin: 0 0 24px; color: var(--muted); font-size: 10px; }
+		.form { display: grid; gap: 15px; }
+		.field { display: grid; gap: 7px; }
+		.field label { color: #c1b6cf; font-size: 10px; }
+		.field input { width: 100%; min-height: 40px; border: 1px solid #5d526e; border-radius: 7px; padding: 9px 11px; outline: 0; color: var(--text); background: var(--deep); }
+		.field input::placeholder { color: #80758f; }
+		.field input:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(67, 184, 255, .12); }
+		.terms { display: flex; align-items: flex-start; gap: 8px; margin: 1px 0 2px; color: var(--muted); font-size: 10px; }
+		.terms input { width: 14px; height: 14px; flex: 0 0 auto; margin: 0; accent-color: var(--cyan); }
+		.terms a, .signin a { color: var(--cyan); text-decoration: none; }
+		.terms a:hover, .signin a:hover { text-decoration: underline; }
+		.submit { min-height: 40px; margin-top: 3px; border-radius: 7px; background: linear-gradient(90deg, #ad65eb, #bd6ef1); font-weight: 700; transition: filter .2s ease, transform .2s ease; }
+		.submit:hover { filter: brightness(1.1); transform: translateY(-1px); }
+		.submit:disabled { cursor: not-allowed; opacity: .55; transform: none; }
+		.divider { display: flex; align-items: center; gap: 10px; margin: 25px 0 17px; color: #857a98; font-size: 9px; }
+		.divider::before, .divider::after { content: ""; height: 1px; flex: 1; background: rgba(215, 205, 235, .14); }
+		.signin { margin: 0; color: var(--muted); text-align: center; font-size: 10px; }
+		@media (max-width: 720px) {
+			.page { padding: 16px; }
+			.shell { grid-template-columns: 1fr; max-width: 460px; min-height: 0; }
+			.brand-panel { min-height: 230px; padding: 28px; }
+			.logo { margin-bottom: 38px; }
+			.brand-footer { margin-top: 30px; }
+			.form-panel { padding: 34px 30px 38px; }
+		}
+		@media (max-width: 390px) {
+			.page { padding: 10px; }
+			.brand-panel, .form-panel { padding-left: 22px; padding-right: 22px; }
+		}
+	</style>
+</head>
+<body>
+	<main class="page">
+		<section class="shell" aria-label="Create a trading portfolio account">
+			<section class="brand-panel">
+				<div class="brand-content">
+					<div class="logo" aria-label="Trading logo"></div>
+					<p class="eyebrow">PORTFOLIO OPERATIONS</p>
+					<h1>Build a clearer view of every trade.</h1>
+					<p class="brand-copy">Create your workspace to monitor positions, model fair value, and keep portfolio risk close at hand.</p>
+				</div>
+				<div class="brand-footer"><i></i><span>Private, focused portfolio tools</span></div>
+			</section>
+
+			<section class="form-panel">
+				<h2>Create your account</h2>
+				<p class="form-intro">Set up your trading workspace in a few quick steps.</p>
+				<form class="form" id="create-account-form">
+					<div class="field"><label for="name">Full name</label><input id="name" name="name" type="text" autocomplete="name" placeholder="Alex Morgan" required></div>
+					<div class="field"><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required></div>
+					<div class="field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="new-password" placeholder="At least 8 characters" minlength="8" required></div>
+					<div class="field"><label for="confirm-password">Confirm password</label><input id="confirm-password" name="confirm-password" type="password" autocomplete="new-password" placeholder="Re-enter your password" minlength="8" required></div>
+					<label class="terms"><input id="terms" name="terms" type="checkbox" required><span>I agree to the <a href="#terms">Terms of service</a> and <a href="#privacy">Privacy policy</a>.</span></label>
+					<button class="submit" type="submit">Create account</button>
+				</form>
+				<div class="divider"><span>Already have an account?</span></div>
+				<p class="signin"><a href="loginpagemockup.html">Sign in to your workspace</a></p>
+			</section>
+		</section>
+	</main>
+	<script>
+		const createAccountForm = document.getElementById('create-account-form');
+		const confirmation = createAccountForm.querySelector('#confirm-password');
+		confirmation.addEventListener('input', () => confirmation.setCustomValidity(''));
+		createAccountForm.addEventListener('submit', event => {
+			event.preventDefault();
+			const form = event.currentTarget;
+			const password = form.querySelector('#password');
+			const button = form.querySelector('.submit');
+			if (password.value !== confirmation.value) {
+				confirmation.setCustomValidity('Passwords must match.');
+				confirmation.reportValidity();
+				return;
+			}
+			confirmation.setCustomValidity('');
+			button.textContent = 'Account created';
+			button.disabled = true;
+		});
+	</script>
+</body>
+</html>
