@@ -1,0 +1,6 @@
+{
+  "id": "mock-user-001",
+  "name": "Test User",
+  "email": "test@test.ca",
+  "password": "test123"
+}

@@ -1,16 +1,32 @@
 import { useState, type FormEvent } from 'react';
+import type { AuthenticatedUser, AuthProvider } from '../../auth/authentication';
 
 interface LoginProps {
+  authProvider: AuthProvider;
+  onAuthenticated: (user: AuthenticatedUser) => void;
   onNavigate: (page: string) => void;
 }
 
-export function Login({ onNavigate }: LoginProps) {
+export function Login({ authProvider, onAuthenticated, onNavigate }: LoginProps) {
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const user = await authProvider.signIn({
+      email: String(formData.get('email') ?? ''),
+      password: String(formData.get('password') ?? ''),
+    });
+
+    if (!user) {
+      setError('The email or password is incorrect.');
+      return;
+    }
+
+    setError('');
     setSubmitted(true);
-    window.setTimeout(() => setSubmitted(false), 1400);
+    onAuthenticated(user);
   };
 
   return (
@@ -45,6 +61,7 @@ export function Login({ onNavigate }: LoginProps) {
               <label className="login-remember"><input type="checkbox" name="remember" /> Remember me</label>
               <span>Secure sign in</span>
             </div>
+            {error && <p className="login-error" role="alert">{error}</p>}
             <button className="login-submit" type="submit">{submitted ? 'Signed in' : 'Sign in'}</button>
           </form>
           <div className="login-divider"><span>New to the workspace?</span></div>

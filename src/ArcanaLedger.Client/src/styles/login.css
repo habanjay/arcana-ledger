@@ -40,6 +40,7 @@
 .login-password-row a, .login-signup a { color: var(--login-cyan); text-decoration: none; }
 .login-password-row a:hover, .login-signup a:hover { text-decoration: underline; }
 .login-options { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: -3px; color: var(--login-muted); font-size: 10px; }
+.login-error { margin: -5px 0 0; color: #ff9aaa; font-size: 10px; }
 .login-remember { display: flex; align-items: center; gap: 7px; cursor: pointer; }
 .login-remember input { width: 14px; height: 14px; margin: 0; accent-color: var(--login-cyan); }
 .login-submit { min-height: 40px; margin-top: 4px; border: 0; border-radius: 7px; color: inherit; background: linear-gradient(90deg, #ad65eb, #bd6ef1); font: inherit; font-weight: 700; cursor: pointer; transition: filter .2s ease, transform .2s ease; }
