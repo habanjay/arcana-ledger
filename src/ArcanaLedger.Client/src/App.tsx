@@ -13,6 +13,7 @@ import './styles/valuation.css';
 import './styles/configuration.css';
 import './styles/login.css';
 import './styles/create-account.css';
+import './styles/typography.css';
 
 function App() {
   const [page, setPage] = useState('Login');
