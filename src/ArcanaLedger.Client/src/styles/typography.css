@@ -1,0 +1,94 @@
+.app,
+.login-page,
+.create-account-page {
+  font-size: 13px;
+}
+
+.nav-label { font-size: 12px; }
+.page-title { font-size: 11px; }
+.search input { font-size: 11px; }
+.avatar { font-size: 12px; }
+.eyebrow { font-size: 9px; }
+.welcome p { font-size: 11px; }
+.section-head p,
+.link-button,
+.stat span,
+.stat small,
+.sector,
+.quote small,
+.quick-button span,
+.action-status,
+.activity-row,
+.activity-row time,
+.chart-label { font-size: 10px; }
+.section-head h2 { font-size: 14px; }
+.name,
+.activity-row strong { font-size: 11px; }
+.quote { font-size: 11px; }
+
+.page-heading p,
+.login-form-intro,
+.create-account-form-intro { font-size: 11px; }
+.page-heading h1 { font-size: 23px; }
+.panel-head h2,
+.configuration-layout .panel-head h2,
+.configuration-layout .panel h2,
+.valuation-layout .panel-head h2,
+.valuation-layout .panel h2 { font-size: 14px; }
+.panel-head p,
+.configuration-layout .panel-head p,
+.valuation-layout .panel-head p,
+.form-head p,
+.summary p { font-size: 10px; }
+.ghost,
+.primary,
+.filter,
+.field label,
+.configuration-layout .field label,
+.control-label,
+.assumption label,
+.login-field label,
+.create-account-field label,
+.login-options,
+.create-account-terms,
+.login-error,
+.create-account-error,
+.login-signup,
+.create-account-signin,
+.badge,
+.panel-badge,
+.status,
+.note,
+.footer-note,
+.table-note,
+.trade-meta,
+.trade-points,
+.trade-quote small,
+.summary-line,
+.metric span,
+.rule span,
+.option,
+.var-row { font-size: 10px; }
+.trade-symbol,
+.stock-symbol { font-size: 11px; }
+.trade-name,
+.trade-quote { font-size: 12px; }
+.stock-name { font-size: 11px; }
+.stock-sector { font-size: 10px; }
+.stock-price { font-size: 11px; }
+.forecast { font-size: 11px; }
+.summary-line strong { font-size: 12px; }
+.section-title { font-size: 11px; }
+
+.login-eyebrow,
+.create-account-eyebrow,
+.login-divider,
+.create-account-divider,
+.login-brand-footer,
+.create-account-brand-footer { font-size: 10px; }
+.login-brand-copy,
+.create-account-brand-copy { font-size: 13px; }
+
+@media (max-width: 560px) {
+  .page-heading h1 { font-size: 22px; }
+}

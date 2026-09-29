@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Portfolio Trading Dashboard</title>
+	<style>
+		:root {
+			--bg: #211b30;
+			--panel: #3b344b;
+			--panel-deep: #2e293e;
+			--line: rgba(215, 205, 235, .28);
+			--muted: #9c91b8;
+			--text: #f8f5ff;
+			--purple: #a43cf7;
+			--magenta: #ed36e8;
+			--cyan: #43b8ff;
+			--green: #16d99b;
+			--red: #ff4d6d;
+		}
+
+		* { box-sizing: border-box; }
+		body {
+			margin: 0;
+			min-width: 320px;
+			color: var(--text);
+			background: var(--bg);
+			font: 12px/1.4 "Segoe UI", Tahoma, sans-serif;
+		}
+
+		button, input { font: inherit; }
+		button { border: 0; color: inherit; cursor: pointer; }
+		button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+		@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior:auto!important; transition-duration:.01ms!important; animation-duration:.01ms!important; } }
+		.app { display: flex; min-height: 100vh; overflow: hidden; }
+
+		.rail {
+			width: 67px;
+			flex: 0 0 67px;
+			border-right: 1px solid rgba(255,255,255,.12);
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			padding: 21px 11px 18px;
+		}
+		.brand { width: 31px; height: 31px; margin: 0 auto 42px; position: relative; }
+		.brand::before, .brand::after { content: ""; position: absolute; width: 24px; height: 18px; transform: skewY(-29deg); }
+		.brand::before { top: 0; left: 0; background: #f05db8; }
+		.brand::after { right: 0; bottom: 0; background: #a96be9; }
+		.nav { display: grid; gap: 13px; width: 100%; }
+		.nav button, .logout {
+			width: 43px; height: 42px; margin: auto; border-radius: 10px; background: transparent;
+			color: #a69ab9; font-size: 19px; transition: .2s ease;
+		}
+		.nav button:hover, .nav button.active { color: #fff; background: #3b304e; }
+		.logout { margin-top: auto; font-size: 18px; }
+
+		.workspace { flex: 1; min-width: 0; padding: 0 20px 20px; }
+		.topbar { height: 74px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 20px; }
+		.back { width: 29px; height: 29px; border-radius: 50%; background: #302941; color: #bcb0d2; font-size: 22px; line-height: 25px; }
+		.page-title { text-align: center; font-weight: 700; font-size: 10px; }
+		.top-actions { justify-self: end; display: flex; align-items: center; gap: 17px; }
+		.search { width: 149px; height: 32px; display: flex; align-items: center; padding: 0 10px 0 13px; border-radius: 11px; background: #302941; color: #bcb0d2; }
+		.search input { width: 100%; border: 0; outline: 0; color: white; background: transparent; font-size: 10px; }
+		.search span { font-size: 18px; line-height: 1; }
+		.icon-button { width: 34px; height: 34px; border-radius: 50%; border: 1px solid #655a75; background: transparent; color: #ddd5e9; font-size: 17px; }
+		.avatar { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; background: #453b59; font-size: 17px; }
+
+		.dashboard { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1.36fr) minmax(300px, 1fr); gap: 14px; }
+		.primary, .secondary { min-width: 0; display: grid; gap: 16px; align-content: start; }
+		.hero { height: 195px; position: relative; overflow: hidden; padding: 21px; border-radius: 15px; background: linear-gradient(115deg, #3217cd, #a34175 62%, #465c98); }
+		.hero::before { content: ""; position: absolute; width: 104px; height: 104px; border: 27px solid #151e34; border-radius: 50%; top: -45px; right: 75px; transform: rotate(-25deg); }
+		.hero::after { content: ""; position: absolute; width: 57px; height: 23px; right: 20px; top: 15px; border-radius: 16px 4px 16px 4px; background: linear-gradient(135deg, #ffb7d1, #5b4aff 70%); transform: rotate(-36deg); box-shadow: 0 0 0 3px rgba(255,255,255,.12); }
+		.hero-copy { position: relative; z-index: 1; max-width: 210px; }
+		.eyebrow { margin: 0 0 7px; font-size: 8px; letter-spacing: .14em; font-weight: 700; }
+		h1 { max-width: 205px; margin: 0 0 8px; font-size: 21px; line-height: 1.16; }
+		.hero p { margin: 0 0 25px; color: #e7dff2; font-size: 10px; line-height: 1.35; }
+		.primary-action { padding: 9px 17px; border-radius: 7px; background: #28145f; font-weight: 700; }
+		.hero-shape { position: absolute; right: 29px; bottom: 28px; width: 70px; height: 70px; background: #a62fb2; transform: rotate(25deg); clip-path: polygon(50% 0, 100% 25%, 70% 100%, 0 75%); opacity: .95; }
+		.hero-orb { position: absolute; right: 80px; bottom: -39px; width: 95px; height: 95px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #5dffcb, #00bfad 50%, #076eaf); }
+
+		.panel { border: 1px solid var(--line); border-radius: 15px; background: var(--panel); }
+		.chart-panel { height: 195px; padding: 16px; }
+		.panel-head, .mini-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+		.panel-head h2, .panel-title { margin: 0; font-size: 13px; }
+		.select { padding: 8px 10px; border-radius: 7px; background: #2b2539; color: white; }
+		.chart { width: 100%; height: calc(100% - 30px); display: block; }
+		.chart text { fill: #8f85a9; font-size: 7px; }
+		.grid-line { stroke: #6c617d; stroke-opacity: .28; stroke-width: 1; }
+		.line-pink { fill: none; stroke: var(--magenta); stroke-width: 2; }
+		.line-blue { fill: none; stroke: var(--cyan); stroke-width: 2; }
+		.line-green { fill: none; stroke: #31d7c4; stroke-width: 2; }
+
+		.ticker-row { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; }
+		.ticker { height: 105px; padding: 12px 10px; overflow: hidden; }
+		.ticker .mini-head { color: #b6acc7; font-size: 10px; }
+		.ticker .pair { color: #b8adc8; white-space: nowrap; }
+		.ticker strong { display: block; margin: 5px 0 0; font-size: 14px; }
+		.ticker .gain { color: var(--green); }
+		.ticker .loss { color: var(--red); }
+		.ticker svg { display: block; width: 100%; height: 40px; margin-top: 1px; }
+		.scroll-button { position: absolute; right: -13px; top: 40px; width: 28px; height: 28px; border: 1px solid #6c5189; border-radius: 50%; background: #302744; font-size: 23px; line-height: 20px; z-index: 2; }
+
+		.overview { height: 195px; padding: 15px 12px 10px; }
+		.overview-chart { height: calc(100% - 28px); }
+
+		.transfer { height: 175px; padding: 14px; background: #3d354e; }
+		.people { display: flex; align-items: center; gap: 9px; margin: 13px 0 11px; }
+		.person, .add-person { width: 42px; height: 42px; display: grid; place-items: center; border: 1px solid #6844a1; border-radius: 50%; background: #4c3d60; font-size: 18px; }
+		.add-person { border-style: dashed; background: transparent; color: white; font-size: 25px; }
+		.amount { display: flex; align-items: center; justify-content: space-between; margin-bottom: 9px; color: #a69aba; }
+		.amount strong { color: white; font-size: 17px; }
+		.transfer-button { width: 100%; padding: 8px; border-radius: 6px; background: linear-gradient(90deg, #ad65eb, #bd6ef1); font-weight: 700; }
+
+		.market, .assets, .profit { padding: 13px 14px; }
+		.market { height: 175px; }
+		.table { width: 100%; border-collapse: collapse; margin-top: 9px; color: #b9aec9; font-size: 9px; }
+		.table th { color: #827791; font-size: 8px; font-weight: 400; text-align: left; padding-bottom: 5px; }
+		.table th:not(:first-child), .table td:not(:first-child) { text-align: right; }
+		.table td { padding: 3px 0; white-space: nowrap; }
+		.coin { color: #ded6e9; }
+		.up { color: var(--green); } .down { color: var(--red); }
+		.bottom-panels { display: grid; grid-template-columns: 1fr 1.4fr; gap: 14px; }
+		.profit, .assets { height: 130px; }
+		.metric { display: flex; align-items: center; gap: 9px; margin-top: 12px; }
+		.metric-icon { width: 29px; height: 29px; display: grid; place-items: center; border-radius: 7px; background: #29253c; color: var(--green); font-size: 18px; }
+		.metric.expense .metric-icon, .expense strong { color: var(--red); }
+		.metric strong { display: block; font-size: 15px; color: #ece6f6; }
+		.metric small { display: block; color: #8f849d; font-size: 8px; }
+		.assets .mini-head span { color: #8e849f; font-size: 16px; }
+		.asset { display: grid; grid-template-columns: 24px 1fr auto; align-items: center; gap: 8px; margin-top: 8px; font-size: 10px; }
+		.asset-icon { width: 21px; height: 21px; display: grid; place-items: center; border-radius: 50%; background: #362c50; color: #ffb632; }
+		.asset small { display: block; color: #978da4; font-size: 8px; }
+		.asset-value { text-align: right; }
+		.portfolio-hero { background: linear-gradient(115deg, #24194c, #61377e 62%, #a24d77); }
+		.portfolio-hero::before { border-color: #17152c; }
+		.portfolio-hero::after { background: linear-gradient(135deg, #f4c1d9, #43b8ff 70%); }
+		.portfolio-hero .hero-copy { max-width: 270px; }
+		.portfolio-hero h1 { max-width: 280px; }
+		.portfolio-hero p { margin-bottom: 16px; }
+		.hero-metrics { display: flex; gap: 24px; position: relative; z-index: 1; }
+		.hero-metric span { display: block; color: #cabddd; font-size: 9px; }
+		.hero-metric strong { display: block; margin-top: 2px; font-size: 15px; }
+		.data-card { background: #332d43; }
+		.data-card .mini-head { font-size: 10px; color: #b8adc8; }
+		.data-card strong { display: block; margin-top: 8px; font-size: 18px; }
+		.data-card small { display: block; margin-top: 1px; color: #9488a9; font-size: 8px; }
+		.data-card .value-positive { color: var(--green); }
+		.data-card .value-negative { color: var(--red); }
+		.trade-chart .chart { height: calc(100% - 30px); }
+		.trade-table-panel { height: 320px; overflow: hidden; }
+		.trade-table-panel .table { font-size: 9px; }
+		.trade-table-panel .table th { padding-bottom: 7px; }
+		.trade-table-panel .table td { padding: 5px 0; border-bottom: 1px solid rgba(215,205,235,.1); }
+		.trade-table-panel .table td:first-child { color: #eee8f5; font-weight: 700; }
+		.trade-table-panel .table td:nth-child(2) { color: #c9bed4; }
+		.trade-table-panel .table td:last-child { color: #a79bb7; text-align: left; padding-left: 8px; }
+		.trade-table-panel .setup { color: #b9aec9; font-size: 8px; }
+		.ratio-list { display: grid; gap: 8px; margin-top: 12px; }
+		.ratio-row { display: flex; justify-content: space-between; padding-bottom: 6px; border-bottom: 1px solid rgba(215,205,235,.12); color: #b8adc8; }
+		.ratio-row strong { color: #f0eaf7; }
+		.ratio-row .negative { color: var(--red); }
+		.setup-bars { display: grid; gap: 8px; margin-top: 11px; }
+		.setup-bar { display: grid; grid-template-columns: 56px 1fr 24px; align-items: center; gap: 7px; color: #b9aec9; font-size: 9px; }
+		.setup-bar i { height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--cyan), var(--magenta)); }
+		.setup-bar:nth-child(2) i { background: linear-gradient(90deg, #7b67eb, #f05db8); }
+		.setup-bar:nth-child(3) i { background: linear-gradient(90deg, #16d99b, #5abfff); }
+		@media (max-width: 820px) {
+			.trade-table-panel { height: auto; min-height: 320px; }
+		}
+
+		@media (max-width: 820px) {
+			.dashboard { grid-template-columns: 1fr; max-width: 600px; }
+			.secondary { grid-template-columns: 1fr 1fr; }
+			.transfer, .market { height: auto; min-height: 175px; }
+			.bottom-panels { grid-column: 1 / -1; }
+		}
+		@media (max-width: 560px) {
+			.rail { width: 54px; flex-basis: 54px; padding-left: 6px; padding-right: 6px; }
+			.workspace { padding: 0 12px 16px; }
+			.topbar { height: 62px; grid-template-columns: auto 1fr auto; }
+			.page-title { display: none; }
+			.top-actions { gap: 7px; }
+			.search { width: 106px; }
+			.icon-button { display: none; }
+			.ticker-row { overflow-x: auto; grid-template-columns: repeat(3, 165px); padding-bottom: 3px; }
+			.secondary { grid-template-columns: 1fr; }
+			.bottom-panels { grid-template-columns: 1fr; }
+			.hero, .chart-panel, .overview { height: auto; min-height: 195px; }
+		}
+	</style>
+</head>
+<body>
+	<div class="app">
+		<aside class="rail">
+			<div class="brand" aria-label="Ethereum logo"></div>
+			<nav class="nav" aria-label="Primary navigation">
+				<button class="active" aria-label="Dashboard">⌂</button>
+				<button aria-label="Analytics">◔</button>
+				<button aria-label="Wallet">▢</button>
+				<button aria-label="Settings">⚙</button>
+			</nav>
+			<button class="logout" aria-label="Log out">↪</button>
+		</aside>
+
+		<main class="workspace">
+			<header class="topbar">
+				<button class="back" aria-label="Back">‹</button>
+				<div class="page-title">Home</div>
+				<div class="top-actions">
+					<label class="search"><input type="search" placeholder="Search" aria-label="Search"><span>⌕</span></label>
+					<button class="icon-button" aria-label="Notifications">♧</button>
+					<div class="avatar" aria-label="Profile">🧑</div>
+				</div>
+			</header>
+
+			<section class="dashboard" aria-label="Portfolio trading dashboard">
+				<div class="primary">
+					<section class="hero portfolio-hero">
+						<div class="hero-copy">
+							<p class="eyebrow">TRADING PORTFOLIO</p>
+							<h1>Portfolio<br>Performance</h1>
+							<p>Review allocation, execution quality,<br>and risk across your active setups.</p>
+							<div class="hero-metrics">
+								<div class="hero-metric"><span>Allocation</span><strong>$262,133.24</strong></div>
+								<div class="hero-metric"><span>Running Balance</span><strong>$256,104.41</strong></div>
+							</div>
+						</div>
+						<div class="hero-shape"></div><div class="hero-orb"></div>
+					</section>
+
+					<section class="ticker-row" aria-label="Portfolio summary">
+						<article class="panel ticker data-card"><div class="mini-head"><span>Net Return</span><span class="loss">▼</span></div><strong class="value-negative">($6,028.83)</strong><small>-2.30% of allocation</small><svg viewBox="0 0 150 38" preserveAspectRatio="none"><polyline class="line-pink" points="0,10 24,12 45,18 65,15 82,25 103,22 125,31 150,35"/></svg></article>
+						<article class="panel ticker data-card"><div class="mini-head"><span>Total Trades</span><span class="gain">●</span></div><strong>19</strong><small>6 wins / 13 losses</small><svg viewBox="0 0 150 38" preserveAspectRatio="none"><polyline class="line-blue" points="0,32 25,27 49,30 72,20 95,23 116,10 150,4"/></svg></article>
+						<article class="panel ticker data-card"><div class="mini-head"><span>Win Rate</span><span class="gain">▲</span></div><strong class="value-positive">$736.06</strong><small>Hit ratio: 31.58%</small><svg viewBox="0 0 150 38" preserveAspectRatio="none"><polyline class="line-green" points="0,32 27,30 47,25 69,26 88,18 110,20 129,10 150,4"/></svg></article>
+						<button class="scroll-button" aria-label="Next prices">›</button>
+					</section>
+
+					<section class="panel overview">
+						<div class="panel-head"><h2>Gain / Loss Overview</h2><button class="select">All Trades　⌄</button></div>
+						<svg class="chart overview-chart" viewBox="0 0 480 150" preserveAspectRatio="none" aria-label="Market overview chart">
+							<g><line class="grid-line" x1="34" y1="20" x2="470" y2="20"/><line class="grid-line" x1="34" y1="52" x2="470" y2="52"/><line class="grid-line" x1="34" y1="84" x2="470" y2="84"/><line class="grid-line" x1="34" y1="116" x2="470" y2="116"/></g>
+							<g><text x="5" y="22">$5k</text><text x="5" y="54">$0</text><text x="1" y="86">-$5k</text><text x="0" y="122">-$10k</text></g>
+							<polyline class="line-green" points="34,86 70,70 108,75 145,57 180,62 215,46 253,54 290,36 328,45 365,33 400,42 435,24 470,30"/>
+							<polyline class="line-pink" points="34,54 70,59 108,57 145,74 180,68 215,85 253,79 290,92 328,83 365,101 400,91 435,110 470,117"/>
+							<circle cx="470" cy="117" r="5" fill="#f8b5ff"/><circle cx="470" cy="117" r="10" fill="#f8b5ff" opacity=".22"/>
+						</svg>
+					</section>
+				</div>
+
+				<div class="secondary">
+					<section class="panel chart-panel trade-chart">
+						<div class="panel-head"><h2>Balance Trend</h2><div><button class="select">YTD</button> <button class="select" style="color:#988ca4">1M</button></div></div>
+						<svg class="chart" viewBox="0 0 420 150" preserveAspectRatio="none" aria-label="Portfolio balance trend">
+							<g><line class="grid-line" x1="25" y1="20" x2="410" y2="20"/><line class="grid-line" x1="25" y1="52" x2="410" y2="52"/><line class="grid-line" x1="25" y1="84" x2="410" y2="84"/><line class="grid-line" x1="25" y1="116" x2="410" y2="116"/></g>
+							<g><text x="0" y="22">263k</text><text x="0" y="54">260k</text><text x="0" y="86">258k</text><text x="0" y="118">256k</text></g>
+							<polyline class="line-blue" points="25,23 82,32 140,28 200,55 260,50 320,82 365,92 410,116"/><polyline class="line-pink" points="25,37 82,44 140,42 200,66 260,62 320,98 365,104 410,128"/>
+						</svg>
+					</section>
+
+					<section class="panel transfer"><h2 class="panel-title">Trade Statistics</h2><div class="people"><div class="person">19</div><div class="person">6</div><div class="add-person">13</div></div><div class="amount"><span>Wins / Losses</span><strong>6 / 13</strong></div><button class="transfer-button">Review Trades</button></section>
+
+					<section class="panel market trade-table-panel"><h2 class="panel-title">Recent Trades</h2><table class="table"><thead><tr><th>Stock</th><th>Setup</th><th>Shares</th><th>Gain / Loss</th><th>Notes</th></tr></thead><tbody><tr><td>IART</td><td class="setup">M - Boomer</td><td>300</td><td class="up">+$548.52</td><td>2.93%</td></tr><tr><td>CMG</td><td class="setup">M - Boomer</td><td>100</td><td class="down">($505.98)</td><td>-1.20%</td></tr><tr><td>DCT</td><td class="setup">M - Boomer</td><td>600</td><td class="down">($258.99)</td><td>-0.65%</td></tr><tr><td>VICR</td><td class="setup">S - Blue Sky</td><td>600</td><td class="up">+$1,109.42</td><td>5.28%</td></tr><tr><td>VICR</td><td class="setup">S - Blue Sky</td><td>600</td><td class="up">+$611.42</td><td>2.84%</td></tr><tr><td>SFLY</td><td class="setup">M - Slingshot</td><td>900</td><td class="down">($353.06)</td><td>-0.42%</td></tr><tr><td>SPHS</td><td class="setup">M - Boomer</td><td>6,000</td><td class="down">($1,021.09)</td><td>-5.88%</td></tr></tbody></table></section>
+
+					<div class="bottom-panels">
+						<section class="panel profit"><h2 class="panel-title">Portfolio Summary</h2><div class="ratio-list"><div class="ratio-row"><span>Total Gain</span><strong class="up">$4,416.38</strong></div><div class="ratio-row"><span>Total Loss</span><strong class="negative">($10,445.21)</strong></div><div class="ratio-row"><span>Burn Rate</span><strong class="negative">($803.48)</strong></div></div></section>
+						<section class="panel assets"><div class="mini-head"><h2 class="panel-title">Setup Mix</h2><span>⌕</span></div><div class="setup-bars"><div class="setup-bar"><span>M - Boomer</span><i style="width:100%"></i><b>4</b></div><div class="setup-bar"><span>S - Blue Sky</span><i style="width:50%"></i><b>2</b></div><div class="setup-bar"><span>M - Slingshot</span><i style="width:25%"></i><b>1</b></div></div></section>
+					</div>
+				</div>
+			</section>
+		</main>
+	</div>
+</body>
+</html>
