@@ -1,9 +1,9 @@
 import type { ConfigurationField, ConfigurationOptionGroup, ConfigurationSection, ConfigurationValues } from '../types/configuration';
 
 export const configurationDefaults: ConfigurationValues = {
-  capital: '$256,104.41', varRate: '0.25%', cashValue: '$84,514.46', portfolioShare: '33% of Portfolio', reserve: '$25,610.44', reserveShare: '10% of Portfolio',
-  positionEntry: '$62.90', positionExit: '$60.00', positionShares: '110', positionCash: '$6,943.52', trancheEntry: '$70.80', trancheExit: '$66.60', trancheShares: '76', trancheCash: '$5,396.49',
-  swingEntry: '$41.80', swingExit: '$39.90', swingShares: '337', swingCash: '$14,085.74', breakout: '$63.00', patternLow: '$60.00', targetPrice: '$66.00', momentum: '5.50% of Portfolio',
+  capital: 'C$256,104.41', varRate: '0.25%', cashValue: 'C$84,514.46', portfolioShare: '33% of Portfolio', reserve: 'C$25,610.44', reserveShare: '10% of Portfolio',
+  positionEntry: 'C$62.90', positionExit: 'C$60.00', positionShares: '110', positionCash: 'C$6,943.52', trancheEntry: 'C$70.80', trancheExit: 'C$66.60', trancheShares: '76', trancheCash: 'C$5,396.49',
+  swingEntry: 'C$41.80', swingExit: 'C$39.90', swingShares: '337', swingCash: 'C$14,085.74', breakout: 'C$63.00', patternLow: 'C$60.00', targetPrice: 'C$66.00', momentum: '5.50% of Portfolio',
 };
 
 export const portfolioFields: ConfigurationField[] = [

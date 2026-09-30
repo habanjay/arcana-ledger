@@ -16,7 +16,7 @@ const inputFields: Array<{ key: ValuationInputKey; label: string; step: string }
   { key: 'price', label: 'Price today', step: '0.01' },
 ];
 
-const formatMoney = (value: number, decimals = 2) => `$${value.toFixed(decimals)}`;
+const formatMoney = (value: number, decimals = 2) => `C$${value.toFixed(decimals)}`;
 const formatMillions = (value: number) => Math.round(value).toLocaleString();
 
 function buildForecast(stock: typeof valuationStocks.AAPL, inputs: ValuationInputs) {
@@ -59,7 +59,7 @@ export function Valuation({ onNavigate }: ValuationProps) {
   return <div className="app">
     <NavigationRail activeLabel="Valuation" onNavigate={onNavigate} />
     <main className="workspace valuation-workspace">
-      <TopBar title="Valuation" />
+      <TopBar title="Valuation" onLogout={() => onNavigate('Login')} />
       <section className="valuation-content" aria-label="Company valuation model">
         <div className="page-heading"><div><h1>Company Valuation</h1><p>Estimate fair value from earnings growth, margins, and comparable multiples.</p></div><div className="heading-actions"><button className="ghost" type="button" onClick={() => { setInputs(valuationDefaults); setSelectedSymbol('AAPL'); setSaved(false); }}>Reset Model</button><button className="primary" type="button" onClick={saveValuation}>{saved ? 'Saved' : 'Save Valuation'}</button></div></div>
         <div className="valuation-layout">
