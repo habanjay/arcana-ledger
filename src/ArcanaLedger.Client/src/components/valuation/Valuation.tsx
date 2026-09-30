@@ -16,7 +16,7 @@ const inputFields: Array<{ key: ValuationInputKey; label: string; step: string }
   { key: 'price', label: 'Price today', step: '0.01' },
 ];
 
-const formatMoney = (value: number, decimals = 2) => `$${value.toFixed(decimals)}`;
+const formatMoney = (value: number, decimals = 2) => `C$${value.toFixed(decimals)}`;
 const formatMillions = (value: number) => Math.round(value).toLocaleString();
 
 function buildForecast(stock: typeof valuationStocks.AAPL, inputs: ValuationInputs) {

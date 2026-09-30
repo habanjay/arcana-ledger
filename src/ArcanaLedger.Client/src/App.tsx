@@ -4,6 +4,7 @@ import { Trades } from './components/trades/Trades';
 import { Valuation } from './components/valuation/Valuation';
 import { Configuration } from './components/configuration/Configuration';
 import { TradeSetups } from './components/trade-setups/TradeSetups';
+import { Analytics } from './components/analytics/Analytics';
 import { Login } from './components/login/Login';
 import { CreateAccount } from './components/create-account/CreateAccount';
 import { mockAuthProvider } from './auth/mockAuthProvider';
@@ -15,6 +16,7 @@ import './styles/configuration.css';
 import './styles/login.css';
 import './styles/create-account.css';
 import './styles/typography.css';
+import './styles/analytics.css';
 
 function App() {
   const [page, setPage] = useState('Login');
@@ -27,6 +29,7 @@ function App() {
   if (page === 'Create account') return <CreateAccount onNavigate={navigate} />;
   if (page === 'Trades') return <Trades onNavigate={navigate} />;
   if (page === 'Trade setups') return <TradeSetups onNavigate={navigate} />;
+  if (page === 'Analytics') return <Analytics onNavigate={navigate} />;
   if (page === 'Valuation') return <Valuation onNavigate={navigate} />;
   if (page === 'Configuration') return <Configuration onNavigate={navigate} />;
   return <Dashboard user={user} onNavigate={navigate} />;

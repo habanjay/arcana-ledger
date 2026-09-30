@@ -295,6 +295,7 @@ export function Configuration({ onNavigate }: ConfigurationProps) {
   const [values, setValues] = useState<ConfigurationValues>(
     configurationDefaults,
   );
+  const [currency, setCurrency] = useState("CAD");
   const [saved, setSaved] = useState(false);
   const updateValue = (event: ChangeEvent<HTMLInputElement>) => {
     setValues(
@@ -308,6 +309,7 @@ export function Configuration({ onNavigate }: ConfigurationProps) {
   };
   const reset = () => {
     setValues(configurationDefaults);
+    setCurrency("CAD");
     setSaved(false);
   };
   const save = () => {
@@ -351,6 +353,24 @@ export function Configuration({ onNavigate }: ConfigurationProps) {
                 />
                 <div className="panel-body">
                   <div className="form-grid">
+                    <div className="field">
+                      <label htmlFor="configuration-currency">Currency</label>
+                      <select
+                        id="configuration-currency"
+                        value={currency}
+                        onChange={(event) => {
+                          setCurrency(event.target.value);
+                          setSaved(false);
+                        }}
+                      >
+                        <option value="CAD">CAD - Canadian dollar</option>
+                        <option value="PHP">PHP - Philippine peso</option>
+                        <option value="USD">USD - US dollar</option>
+                        <option value="EUR">EUR - Euro</option>
+                        <option value="GBP">GBP - British pound</option>
+                        <option value="JPY">JPY - Japanese yen</option>
+                      </select>
+                    </div>
                     {portfolioFields.map((field) => (
                       <Field
                         key={field.key}
@@ -365,11 +385,11 @@ export function Configuration({ onNavigate }: ConfigurationProps) {
                   <div className="rule-grid">
                     <div className="rule green">
                       <span>VAR @ 0.25%</span>
-                      <strong>$640.26</strong>
+                      <strong>C$640.26</strong>
                     </div>
                     <div className="rule red">
                       <span>Max daily loss</span>
-                      <strong>($803.48)</strong>
+                      <strong>(C$803.48)</strong>
                     </div>
                     <div className="rule">
                       <span>Position risk</span>
@@ -411,7 +431,7 @@ export function Configuration({ onNavigate }: ConfigurationProps) {
                 <p>Current portfolio allocation</p>
                 <div className="summary-value">
                   {values.capital}
-                  <small>VAR capacity $640.26</small>
+                  <small>{currency} display currency · VAR capacity C$640.26</small>
                 </div>
                 <div className="summary-line">
                   <span>Capital at risk</span>
