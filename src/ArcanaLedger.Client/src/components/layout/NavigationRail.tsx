@@ -9,7 +9,7 @@ interface NavigationRailProps {
   onNavigate?: (label: string) => void;
 }
 
-const defaultItems: NavigationItem[] = [{ label: 'Home', icon: '⌂' }, { label: 'Trades', icon: '↗' }, { label: 'Trade setups', icon: '◈' }, { label: 'Analytics', icon: '◔' }, { label: 'Valuation', icon: '▣' }, { label: 'Configuration', icon: '⚙' }];
+const defaultItems: NavigationItem[] = [{ label: 'Home', icon: '⌂' }, { label: 'Trades', icon: '↗' }, { label: 'Trade review', icon: '✓' }, { label: 'Trade setups', icon: '◈' }, { label: 'Analytics', icon: '◔' }, { label: 'Valuation', icon: '▣' }, { label: 'Configuration', icon: '⚙' }];
 
 export function NavigationRail({ items = defaultItems, expanded, onToggle, activeLabel = 'Home', onNavigate = () => undefined }: NavigationRailProps) {
   const [internalExpanded, setInternalExpanded] = useState(false);
