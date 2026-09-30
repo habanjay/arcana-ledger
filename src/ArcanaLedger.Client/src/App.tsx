@@ -3,6 +3,7 @@ import { Dashboard } from './components/dashboard/Dashboard';
 import { Trades } from './components/trades/Trades';
 import { Valuation } from './components/valuation/Valuation';
 import { Configuration } from './components/configuration/Configuration';
+import { TradeSetups } from './components/trade-setups/TradeSetups';
 import { Login } from './components/login/Login';
 import { CreateAccount } from './components/create-account/CreateAccount';
 import { mockAuthProvider } from './auth/mockAuthProvider';
@@ -18,12 +19,17 @@ import './styles/typography.css';
 function App() {
   const [page, setPage] = useState('Login');
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
-  if (page === 'Login') return <Login authProvider={mockAuthProvider} onAuthenticated={(authenticatedUser) => { setUser(authenticatedUser); setPage('Dashboard'); }} onNavigate={setPage} />;
-  if (page === 'Create account') return <CreateAccount onNavigate={setPage} />;
-  if (page === 'Trades') return <Trades onNavigate={setPage} />;
-  if (page === 'Valuation') return <Valuation onNavigate={setPage} />;
-  if (page === 'Configuration') return <Configuration onNavigate={setPage} />;
-  return <Dashboard user={user} onNavigate={setPage} />;
+  const navigate = (label: string) => {
+    if (label === 'Login') setUser(null);
+    setPage(label);
+  };
+  if (page === 'Login') return <Login authProvider={mockAuthProvider} onAuthenticated={(authenticatedUser) => { setUser(authenticatedUser); setPage('Dashboard'); }} onNavigate={navigate} />;
+  if (page === 'Create account') return <CreateAccount onNavigate={navigate} />;
+  if (page === 'Trades') return <Trades onNavigate={navigate} />;
+  if (page === 'Trade setups') return <TradeSetups onNavigate={navigate} />;
+  if (page === 'Valuation') return <Valuation onNavigate={navigate} />;
+  if (page === 'Configuration') return <Configuration onNavigate={navigate} />;
+  return <Dashboard user={user} onNavigate={navigate} />;
 }
 
 export default App;

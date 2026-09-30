@@ -16,6 +16,7 @@ export const activity: ActivityItem[] = [
 export const navigationItems: NavigationItem[] = [
   { label: 'Home', icon: '⌂' },
   { label: 'Trades', icon: '↗' },
+  { label: 'Trade setups', icon: '◈' },
   { label: 'Valuation', icon: '▣' },
   { label: 'Configuration', icon: '⚙' },
 ];

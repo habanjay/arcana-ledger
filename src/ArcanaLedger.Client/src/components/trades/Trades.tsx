@@ -49,7 +49,7 @@ export function Trades({ onNavigate }: TradesProps) {
   return <div className="app">
     <NavigationRail activeLabel="Trades" onNavigate={onNavigate} />
     <main className="workspace trades-workspace">
-      <TopBar title="Trades" />
+      <TopBar title="Trades" onLogout={() => onNavigate('Login')} />
       <section className="trade-content" aria-label="Trade ledger">
         <div className="page-heading"><div><h1>Trade Ledger</h1><p>Review open and completed positions, execution costs, and realized performance.</p></div><div className="heading-actions"><button className="ghost" type="button" onClick={exportCsv}>{exported ? 'Exported' : 'Export CSV'}</button><button className="primary" type="button" onClick={() => setModalOpen(true)}>Log trade</button></div></div>
         <section className="summary-grid" aria-label="Trade summary"><article className="panel stat"><span>Total trades</span><strong>{tradeList.length}</strong><small>Across 5 symbols</small></article><article className="panel stat"><span>Winning trades</span><strong className="positive">3</strong><small>50.00% win rate</small></article><article className="panel stat"><span>Realized gain / loss</span><strong className="positive">$1,152.41</strong><small>Net of commissions</small></article><article className="panel stat"><span>Capital deployed</span><strong>$42,196.20</strong><small>Peak exposure</small></article></section>

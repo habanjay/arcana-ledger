@@ -6,6 +6,7 @@
 
 .nav-label { font-size: 12px; }
 .page-title { font-size: 11px; }
+.topbar .page-title { padding-left: 30px; }
 .search input { font-size: 11px; }
 .avatar { font-size: 12px; }
 .eyebrow { font-size: 9px; }
