@@ -1,3 +1,5 @@
+.setup-playbook-link { margin: 12px 15px 0; padding: 0; border: 0; color: var(--cyan); background: transparent; font-size: 10px; font-weight: 700; }
+.setup-playbook-link:hover { color: #fff; text-decoration: underline; }
 .configuration-workspace { padding-bottom: 24px; }
 .configuration-content { max-width: 1080px; margin: 0 auto; }
 .configuration-layout { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(280px, .85fr); gap: 14px; align-items: start; }

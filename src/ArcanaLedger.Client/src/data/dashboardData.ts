@@ -28,4 +28,5 @@ export const quickActions = [
   ['⚙', 'Configure risk'],
   ['↗', 'Log a trade'],
   ['◔', 'View analytics'],
+  ['◈', 'Open setup playbook'],
 ] as const;
