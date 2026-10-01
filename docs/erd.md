@@ -1,7 +1,13 @@
 
 # Arcana Ledger database schema
 
-This document is the proposed relational model for the trading dashboard. The DDL targets PostgreSQL 16+ and is intentionally independent of the current mock frontend data. Amounts are stored as `numeric`, never floating point, and timestamps are stored in UTC with `timestamptz`.
+This document is the proposed relational model for the trading dashboard. It is a target design, not the database schema currently deployed by `ArcanaLedger.Server`.
+
+## Implementation status
+
+The current server has no PostgreSQL resource in the Aspire AppHost, no database package, EF Core `DbContext`, migrations, repositories, or domain entities. The React client uses local mock data. The tables and DDL in this document should therefore be treated as the planned persistence contract for a future implementation.
+
+The DDL targets PostgreSQL 16+ and is intentionally independent of the current mock frontend data. Amounts are stored as `numeric`, never floating point, and timestamps are stored in UTC with `timestamptz`.
 
 ## Entity relationship diagram
 
@@ -211,7 +217,7 @@ erDiagram
 | `valuation_forecasts` | One row per forecast year produced by a valuation model. |
 | `portfolio_settings` | Portfolio risk, reserve, and per-setup position-sizing defaults shown on the Configuration page, with allocation percentages as generated columns. |
 
-## PostgreSQL DDL
+## Planned PostgreSQL DDL
 
 Run this as an initial migration. Application migrations should add columns or tables in later revisions rather than editing an already-applied migration.
 

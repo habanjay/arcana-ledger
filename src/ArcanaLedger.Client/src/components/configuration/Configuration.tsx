@@ -62,7 +62,7 @@ function SetupChart({ setupName, large = false }: { setupName: string; large?: b
   return <svg className={large ? "setup-chart-large" : "setup-thumbnail"} viewBox={large ? "0 0 520 180" : "0 0 120 42"} role="img" aria-label={`${setupName} sample chart`}><polyline className="thumbnail-line" points={family === "Position" ? (large ? "2,142 70,122 138,130 206,100 274,108 342,75 410,86 518,38" : "2,32 18,27 34,29 50,22 66,24 82,15 98,18 118,9") : (large ? "2,148 70,144 138,136 206,140 274,88 342,98 410,51 470,62 518,18" : "2,34 18,33 34,31 50,32 66,20 82,23 98,12 118,6")} /><line className="thumbnail-entry" x1={large ? entryX === "82" ? "410" : "274" : entryX} y1="4" x2={large ? entryX === "82" ? "410" : "274" : entryX} y2={large ? "170" : "38"} /><circle className="thumbnail-dot" cx={large ? entryX === "82" ? "410" : "274" : entryX} cy={large ? entryY === "15" ? "86" : "88" : entryY} r={large ? "6" : "3"} /></svg>;
 }
 
-export function SetupReferencePanel() {
+export function SetupReferencePanel({ onNavigate }: { onNavigate?: (label: string) => void }) {
   const setups = optionGroups.find((group) => group.label === "Setup")?.options ?? [];
   const [selectedSetup, setSelectedSetup] = useState<string | null>(null);
   useEffect(() => {
@@ -73,7 +73,8 @@ export function SetupReferencePanel() {
   return (
     <section className="panel setup-reference-panel">
       <PanelHeader title="Configured Trade Setups" subtitle="Each setup has its own execution rules and visual reference" badge="Reference" />
-      <div className="setup-reference-table-wrap">
+        {onNavigate && <button className="setup-playbook-link" type="button" onClick={() => onNavigate('Setup playbook')}>Open execution playbook</button>}
+        <div className="setup-reference-table-wrap">
         <table className="setup-reference-table">
           <thead><tr><th>Order Type</th><th>Setup</th><th>Family</th><th>Trend</th><th>Tranches</th><th>VAR</th><th>Sample</th></tr></thead>
           <tbody>{setups.map((setupName) => {

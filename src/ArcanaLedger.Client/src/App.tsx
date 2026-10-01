@@ -6,6 +6,7 @@ import { Configuration } from './components/configuration/Configuration';
 import { TradeSetups } from './components/trade-setups/TradeSetups';
 import { Analytics } from './components/analytics/Analytics';
 import { TradeReview } from './components/trade-review/TradeReview';
+import { SetupPlaybook } from './components/setup-playbook/SetupPlaybook';
 import { Login } from './components/login/Login';
 import { CreateAccount } from './components/create-account/CreateAccount';
 import { mockAuthProvider } from './auth/mockAuthProvider';
@@ -19,6 +20,7 @@ import './styles/create-account.css';
 import './styles/typography.css';
 import './styles/analytics.css';
 import './styles/trade-review.css';
+import './styles/setup-playbook.css';
 
 function App() {
   const [page, setPage] = useState('Login');
@@ -32,6 +34,7 @@ function App() {
   if (page === 'Trades') return <Trades onNavigate={navigate} />;
   if (page === 'Trade review') return <TradeReview onNavigate={navigate} />;
   if (page === 'Trade setups') return <TradeSetups onNavigate={navigate} />;
+  if (page === 'Setup playbook') return <SetupPlaybook onNavigate={navigate} />;
   if (page === 'Analytics') return <Analytics onNavigate={navigate} />;
   if (page === 'Valuation') return <Valuation onNavigate={navigate} />;
   if (page === 'Configuration') return <Configuration onNavigate={navigate} />;

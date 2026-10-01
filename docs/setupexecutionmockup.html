@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Setup Execution Playbook</title>
+	<style>
+		:root { --bg:#211b30; --panel:#3b344b; --deep:#302941; --line:rgba(215,205,235,.24); --muted:#9c91b8; --text:#f8f5ff; --cyan:#43b8ff; --green:#16d99b; --red:#ff4d6d; --amber:#ffb632; --magenta:#f05db8; }
+		* { box-sizing:border-box; } body { margin:0; min-width:320px; color:var(--text); background:var(--bg); font:12px/1.4 "Segoe UI",Tahoma,sans-serif; } button,input,select { font:inherit; } button { border:0; color:inherit; cursor:pointer; }
+		button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible { outline:2px solid var(--cyan); outline-offset:3px; }
+		@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior:auto!important; transition-duration:.01ms!important; animation-duration:.01ms!important; } }
+		.app { display:flex; min-height:100vh; overflow:hidden; } .rail { width:67px; flex:0 0 67px; border-right:1px solid rgba(255,255,255,.12); display:flex; flex-direction:column; align-items:center; padding:21px 11px 18px; }
+		.brand { width:31px; height:31px; margin:0 auto 42px; position:relative; } .brand::before,.brand::after { content:""; position:absolute; width:24px; height:18px; transform:skewY(-29deg); } .brand::before { top:0; left:0; background:#f05db8; } .brand::after { right:0; bottom:0; background:#a96be9; }
+		.nav { display:grid; gap:13px; width:100%; } .nav button,.logout { width:43px; height:42px; margin:auto; border-radius:10px; background:transparent; color:#a69ab9; font-size:19px; transition:.2s ease; } .nav button:hover,.nav button.active { color:#fff; background:#3b304e; } .logout { margin-top:auto; font-size:18px; }
+		.workspace { flex:1; min-width:0; padding:0 20px 24px; } .topbar { height:74px; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:20px; } .back { width:29px; height:29px; border-radius:50%; background:var(--deep); color:#bcb0d2; font-size:22px; line-height:25px; } .page-title { text-align:center; font-weight:700; font-size:10px; } .top-actions { justify-self:end; display:flex; align-items:center; gap:17px; }
+		.search { width:149px; height:32px; display:flex; align-items:center; padding:0 10px 0 13px; border-radius:11px; background:var(--deep); color:#bcb0d2; } .search input { width:100%; border:0; outline:0; color:#fff; background:transparent; font-size:10px; } .search span { font-size:18px; line-height:1; } .icon-button { width:34px; height:34px; border-radius:50%; border:1px solid #655a75; background:transparent; color:#ddd5e9; font-size:17px; } .avatar { width:34px; height:34px; display:grid; place-items:center; border-radius:50%; background:#453b59; font-size:17px; }
+		.content { max-width:1220px; margin:0 auto; } .page-heading { display:flex; align-items:end; justify-content:space-between; gap:20px; margin:0 0 18px; flex-wrap:wrap; } h1 { margin:0; font-size:22px; line-height:1.1; } .page-heading p { margin:6px 0 0; color:var(--muted); font-size:10px; } .heading-actions { display:flex; align-items:center; gap:9px; } .ghost,.primary { padding:9px 14px; border-radius:7px; font-weight:700; } .ghost { background:var(--deep); color:#c7bdd5; } .primary { background:linear-gradient(90deg,#ad65eb,#bd6ef1); }
+		.setup-select { min-height:32px; border:1px solid #5d526e; border-radius:6px; padding:6px 9px; color:#c7bdd5; background:var(--deep); font-size:9px; }
+		.grid { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(280px,.85fr); gap:14px; align-items:start; } .column { display:grid; gap:14px; min-width:0; }
+		.panel { border:1px solid var(--line); border-radius:15px; background:var(--panel); overflow:hidden; } .panel-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 15px; border-bottom:1px solid rgba(215,205,235,.14); } .panel-head h2 { margin:0; font-size:13px; } .panel-head p { margin:3px 0 0; color:var(--muted); font-size:9px; } .panel-badge { padding:4px 8px; border-radius:5px; background:rgba(22,217,155,.13); color:var(--green); font-size:9px; font-weight:700; white-space:nowrap; } .panel-badge.alt { background:rgba(67,184,255,.14); color:var(--cyan); } .panel-body { padding:14px 15px; }
+		.panel-badge.cat-swing { background:rgba(67,184,255,.14); color:var(--cyan); } .panel-badge.cat-momentum { background:rgba(240,93,184,.16); color:var(--magenta); } .panel-badge.cat-position { background:rgba(22,217,155,.13); color:var(--green); } .panel-badge.cat-capitulation { background:rgba(255,182,50,.16); color:var(--amber); }
+		.source-note { display:flex; align-items:flex-start; gap:8px; margin:0 0 13px; padding:9px 10px; border-radius:8px; background:rgba(67,184,255,.08); border:1px solid rgba(67,184,255,.25); color:#bcdcf2; font-size:9px; line-height:1.5; } .source-note.derived { background:rgba(255,182,50,.08); border-color:rgba(255,182,50,.3); color:#ecd9b6; } .source-note i { font-style:normal; }
+		.section-title { margin:0 0 10px; color:#ded6e9; font-size:10px; text-transform:uppercase; letter-spacing:.1em; } .divider { height:1px; margin:16px 0; background:rgba(215,205,235,.12); }
+		.setup-desc { margin:0 0 15px; color:#c7bdd5; font-size:10px; line-height:1.55; }
+		.condition-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; } .condition { display:flex; align-items:flex-start; gap:9px; padding:10px; border-radius:8px; background:#332d43; }
+		.condition i { flex:0 0 20px; width:20px; height:20px; display:grid; place-items:center; border-radius:50%; background:rgba(22,217,155,.16); color:var(--green); font-size:11px; font-style:normal; }
+		.condition span { display:block; color:#f0eaf7; font-size:10px; font-weight:700; } .condition small { display:block; margin-top:2px; color:#a79bb7; font-size:9px; }
+		.chart-wrap svg { width:100%; height:auto; display:block; } .chart-wrap text { fill:#8f85a9; font-size:8px; } .chart-grid { stroke:#6c617d; stroke-opacity:.28; stroke-width:1; }
+		.price-line { fill:none; stroke:#ddd5e9; stroke-width:2; } .ema-line { fill:none; stroke:var(--cyan); stroke-width:1.6; stroke-dasharray:4 3; }
+		.target-line { stroke:var(--green); stroke-width:1.4; stroke-dasharray:5 4; } .cutloss-line { stroke:var(--red); stroke-width:1.4; stroke-dasharray:5 4; } .entry-line { stroke:var(--amber); stroke-width:1.2; stroke-dasharray:2 3; }
+		.chart-legend { display:flex; flex-wrap:wrap; gap:14px; margin-top:12px; padding-top:12px; border-top:1px solid rgba(215,205,235,.12); } .legend-item { display:flex; align-items:center; gap:6px; color:#b8adc8; font-size:9px; } .legend-swatch { width:16px; height:3px; border-radius:2px; } .legend-dot { width:8px; height:8px; border-radius:50%; }
+		.step-list { display:grid; gap:10px; counter-reset:step; } .step { display:grid; grid-template-columns:26px 1fr; gap:11px; padding:11px; border-radius:8px; background:#332d43; } .step-num { width:26px; height:26px; display:grid; place-items:center; border-radius:50%; background:#4a3f60; color:#fff; font-weight:700; font-size:11px; } .step strong { display:block; color:#f0eaf7; font-size:10px; } .step p { margin:3px 0 0; color:#a79bb7; font-size:9px; line-height:1.5; }
+		.form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:13px 18px; } .field { display:grid; gap:5px; } .field label { color:#b8adc8; font-size:9px; } .field input { width:100%; min-height:31px; border:1px solid #5d526e; border-radius:6px; padding:6px 9px; outline:0; color:#f7f2ff; background:#302a40; } .input-positive { color:var(--green) !important; } .input-negative { color:var(--red) !important; }
+		.summary { padding:16px; background:linear-gradient(135deg,#24194c,#61377e 62%,#a24d77); position:relative; overflow:hidden; } .summary::after { content:""; position:absolute; width:100px; height:100px; right:-26px; bottom:-48px; border-radius:50%; background:#16d99b; opacity:.55; } .summary > * { position:relative; z-index:1; } .summary h2 { margin:0 0 4px; font-size:13px; } .summary p { margin:0; color:#d0c3dd; font-size:9px; }
+		.summary-grid-mini { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px; } .summary-metric span { display:block; color:#d0c3dd; font-size:9px; } .summary-metric strong { display:block; margin-top:4px; font-size:17px; }
+		.control-panel { padding:15px; } .control-panel h2 { margin:0 0 3px; font-size:13px; } .control-panel > p { margin:0 0 13px; color:var(--muted); font-size:9px; }
+		.checklist { display:grid; gap:8px; } .check-item { display:flex; align-items:center; gap:9px; padding:9px 10px; border-radius:7px; background:#332d43; text-align:left; width:100%; } .check-item .box { flex:0 0 17px; width:17px; height:17px; border-radius:5px; border:1px solid #6c5f80; display:grid; place-items:center; font-size:10px; color:transparent; } .check-item.checked .box { background:var(--green); border-color:var(--green); color:#132018; } .check-item span { color:#c7bdd5; font-size:9.5px; } .check-item.checked span { color:#f0eaf7; }
+		.doable-columns { display:grid; grid-template-columns:1fr 1fr; gap:10px; } .do-list, .dont-list { display:grid; gap:7px; margin:0; padding:0; list-style:none; } .do-list li, .dont-list li { padding-left:16px; position:relative; color:#c7bdd5; font-size:9px; line-height:1.4; } .do-list li::before { content:"✓"; position:absolute; left:0; color:var(--green); font-weight:700; } .dont-list li::before { content:"✕"; position:absolute; left:0; color:var(--red); font-weight:700; }
+		.related-chips { display:flex; flex-wrap:wrap; gap:7px; } .chip { padding:7px 9px; border-radius:6px; background:#302a40; border:1px solid #5d526e; color:#b9aec9; font-size:9px; } .chip.active { border-color:var(--cyan); color:#fff; background:rgba(67,184,255,.14); }
+		@media (max-width:820px) { .grid { grid-template-columns:1fr; max-width:640px; margin:auto; } .summary { order:-1; } .condition-list { grid-template-columns:1fr; } }
+		@media (max-width:560px) { .rail { width:54px; flex-basis:54px; padding-left:6px; padding-right:6px; } .workspace { padding:0 12px 18px; } .topbar { height:62px; grid-template-columns:auto 1fr auto; } .page-title,.icon-button { display:none; } .top-actions { gap:7px; } .search { width:106px; } .page-heading { align-items:start; flex-direction:column; } .heading-actions { width:100%; flex-wrap:wrap; } .heading-actions button, .heading-actions select { flex:1; } .form-grid { grid-template-columns:1fr; } .doable-columns { grid-template-columns:1fr; } .summary-grid-mini { grid-template-columns:1fr; } }
+	</style>
+</head>
+<body>
+	<div class="app">
+		<aside class="rail"><div class="brand" aria-label="Trading logo"></div><nav class="nav" aria-label="Primary navigation"><button aria-label="Dashboard">⌂</button><button aria-label="Trades">↗</button><button aria-label="Valuation">▣</button><button class="active" aria-label="Configuration">⚙</button></nav><button class="logout" aria-label="Log out">↪</button></aside>
+		<main class="workspace">
+			<header class="topbar"><button class="back" aria-label="Back">‹</button><div class="page-title">Setup Playbook</div><div class="top-actions"><label class="search"><input type="search" placeholder="Search setups" aria-label="Search setups"><span>⌕</span></label><button class="icon-button" aria-label="Notifications">♧</button><div class="avatar" aria-label="Profile">🧑</div></div></header>
+
+			<section class="content" aria-label="Setup execution playbook">
+				<div class="page-heading">
+					<div><h1>Setup Execution Playbook</h1><p>When, what, and how to execute this setup — with entry, cutloss, and target reference points.</p></div>
+					<div class="heading-actions">
+						<select class="setup-select" id="setup-picker" aria-label="Select setup">
+							<optgroup label="Swing">
+								<option value="s-pullback">S - Pullback</option>
+								<option value="s-blue-sky">S - Blue Sky Breakout</option>
+							</optgroup>
+							<optgroup label="Momentum">
+								<option value="m-expansion-breakout">M - Expansion Breakout</option>
+								<option value="m-slingshot">M - Slingshot</option>
+								<option value="m-jack-in-the-box">M - Jack in the Box</option>
+								<option value="m-180-degrees">M - 180 Degrees</option>
+								<option value="m-boomer">M - Boomer</option>
+								<option value="m-123-pullback">M - 1,2,3 Pullback</option>
+							</optgroup>
+							<optgroup label="Position">
+								<option value="p-coil">P - Coil</option>
+								<option value="p-base0-duration">P - Base 0 Duration</option>
+							</optgroup>
+							<optgroup label="Capitulation">
+								<option value="c-capitulation">C - Capitulation</option>
+								<option value="c-square-root">C - Square Root</option>
+							</optgroup>
+						</select>
+						<button class="ghost" id="print-playbook">Print Playbook</button>
+						<button class="primary" id="edit-configuration">Edit in Configuration</button>
+					</div>
+				</div>
+
+				<div class="grid">
+					<div class="column">
+						<section class="panel">
+							<div class="panel-head"><div><h2 id="setup-name">S - Pullback</h2><p id="setup-sub">Swing · Long · Trend-continuation entry</p></div><span class="panel-badge" id="setup-badge">Swing</span></div>
+							<div class="panel-body">
+								<div class="source-note" id="source-note"><i>ℹ</i><span id="source-note-text"></span></div>
+								<p class="setup-desc" id="setup-desc"></p>
+								<h3 class="section-title">When to execute — required conditions</h3>
+								<div class="condition-list" id="condition-list"></div>
+							</div>
+						</section>
+
+						<section class="panel">
+							<div class="panel-head"><div><h2>Entry / Exit / Cutloss Reference</h2><p>Sample chart illustrating the trigger, stop, and target</p></div><span class="panel-badge alt">Sample trade</span></div>
+							<div class="panel-body chart-wrap" id="chart-container"></div>
+						</section>
+
+						<section class="panel">
+							<div class="panel-head"><div><h2>How to Execute</h2><p>Follow these steps in order once the conditions above are met</p></div></div>
+							<div class="panel-body">
+								<ol class="step-list" id="step-list" style="list-style:none; margin:0; padding:0;"></ol>
+							</div>
+						</section>
+
+						<section class="panel">
+							<div class="panel-head"><div><h2>Execution Parameters</h2><p>Reference values used for sizing and risk on this setup</p></div></div>
+							<div class="panel-body">
+								<div class="form-grid" id="params-grid"></div>
+							</div>
+						</section>
+					</div>
+
+					<div class="column">
+						<section class="panel summary">
+							<h2>Setup Performance</h2><p id="stats-sub">Historical results for S - Pullback</p>
+							<div class="summary-grid-mini" id="stats-grid"></div>
+						</section>
+
+						<section class="panel control-panel">
+							<h2>Pre-Trade Checklist</h2><p>Tap each item once confirmed on the live chart</p>
+							<div class="checklist" id="checklist"></div>
+						</section>
+
+						<section class="panel control-panel">
+							<h2>Do's and Don'ts</h2><p>Common execution mistakes to avoid</p>
+							<div class="doable-columns">
+								<ul class="do-list" id="do-list"></ul>
+								<ul class="dont-list" id="dont-list"></ul>
+							</div>
+						</section>
+
+						<section class="panel control-panel">
+							<h2>Related Setups</h2><p>Other playbooks in the same category</p>
+							<div class="related-chips" id="related-chips"></div>
+						</section>
+					</div>
+				</div>
+			</section>
+		</main>
+	</div>
+	<script>
+		const SETUPS = {
+			's-pullback': {
+				name: 'S - Pullback', category: 'Swing', order: 'Long',
+				sourceNote: 'Documented — Caylum Trading Institute Swing Trading course &amp; case study (ZM, SHOP).', derived: false,
+				description: 'A stock in a strong uptrend (above the 50 and 200 EMA) pulls back to the 10 EMA on light volume. The setup triggers on the first uptick day off the 10 EMA: once that day\u2019s small range is broken to the upside, the prior trend is confirmed to be resuming.',
+				conditions: [
+					['Uptrend confirmed', 'Price above the 50 EMA and 200 EMA'],
+					['ADX > 30', 'Strong directional trend in place'],
+					['Pullback to the 10 EMA', 'Price retraces to touch or sit just above the 10 EMA'],
+					['Volume contracts on the pullback', 'Lighter than average volume while price retraces'],
+					['Prior swing high marked', 'Used as the 2R / profit-taking reference'],
+				],
+				steps: [
+					['Confirm the trend', 'Check price is above both the 50 and 200 EMA with ADX > 30 on the daily chart.'],
+					['Wait for the pullback', 'Let price retrace to the 10 EMA on light volume.'],
+					['Watch the uptick day', 'Mark the high/low range of the first up day off the 10 EMA.'],
+					['Enter on the break', 'Buy on a break above the uptick day\u2019s high.'],
+					['Place the cutloss', 'Sell stop below the uptick day\u2019s low.'],
+					['Manage the target', 'Sell at least 50% at the 2R target; trail the rest on a break of the prior day\u2019s low or a one-day reversal (ODR).'],
+				],
+				params: { entry:'$209.00 — break of the uptick-day high off the 10 EMA', cutloss:'$196.00 — break of the uptick-day low', target:'$235.00 — 2R, sell ≥50% then trail', rr:'2R min ($13.00 risk vs $26.00 reward)', timeframe:'Daily chart, hold 3–10 sessions', order:'Long', sizing:'VAR 0.5% of capital ÷ risk per share', varPct:'0.5% ($500 per $100k)' },
+				stats: [['Case studies on file','2 (ZM, SHOP)'],['Target R-multiple','2R min'],['Avg position size','8.6% of capital'],['Typical hold','3–10 sessions']],
+				checklist: ['Price above 50 &amp; 200 EMA','ADX reading above 30','Pullback touches the 10 EMA','Volume light on the pullback','Uptick day range marked','Cutloss sized to 0.5% VAR'],
+				dos: ['Wait for the uptick-day range to break','Size the stop before entering','Take ≥50% off at 2R'],
+				donts: ['Buy the pullback low pre-emptively','Trade it without ADX > 30','Skip the partial profit at 2R'],
+				chart: { emaLabel:'10 EMA', price:'34,158 65,132 96,110 127,96 158,108 189,128 220,150 251,166 282,175 313,170 344,150 375,140 392,128 423,104 454,80 485,60 516,48 547,42 586,38', ema:'34,150 80,146 126,141 172,138 218,144 264,152 310,160 356,163 392,158 438,142 484,118 530,92 586,64', entry:{x:392,y:128,label:'Entry $209.00'}, cutlossY:178, cutlossLabel:'Cutloss $196.00', targetY:40, targetLabel:'Target $235.00 (2R)' },
+			},
+			's-blue-sky': {
+				name: 'S - Blue Sky Breakout', category: 'Swing', order: 'Long',
+				sourceNote: 'Adapted — derived from the Range Trade / Bluesky breakout concepts in the course material (no setup with this exact name on file); condensed to swing duration and 0.5% VAR.', derived: true,
+				description: 'Price consolidates in a tight range at the 20 EMA (or the 50 EMA when the trend is weaker) with no resistance overhead — open \u2018blue sky\u2019 to new highs. The setup triggers when price breaks the top of that range on expanding volume, clearing the way for a fast move into new-high territory.',
+				conditions: [
+					['Uptrend in place', 'Price holding above the 20 EMA'],
+					['ADX > 30 uses the 20 EMA', 'ADX < 30 shifts the reference to the 50 EMA'],
+					['Tight consolidation range', 'Clearly defined high/low with little overlap'],
+					['Volume contracts then expands', 'Light volume in the range, a pickup on the breakout day'],
+					['No overhead resistance', 'Breakout leads into new highs, not back into supply'],
+				],
+				steps: [
+					['Confirm the trend', 'Price above the 20 EMA (or 50 EMA if ADX < 30).'],
+					['Mark the range', 'Draw the high and low of the consolidation.'],
+					['Wait for the breakout', 'Watch for the first uptick day to clear the range high.'],
+					['Enter on confirmation', 'Buy on the break of the range high.'],
+					['Place the cutloss', 'Sell stop below the range low.'],
+					['Manage the target', 'Sell 50% at 2R; trail the remainder into new highs.'],
+				],
+				params: { entry:'$37.40 — break of the consolidation range high (20 EMA)', cutloss:'$35.80 — break of the range low', target:'$40.60 — 2R, sell 50% then trail', rr:'2R min ($1.60 risk vs $3.20 reward)', timeframe:'Daily chart, hold 3–10 sessions', order:'Long', sizing:'VAR 0.5% of capital ÷ risk per share', varPct:'0.5% ($500 per $100k)' },
+				stats: [['Case studies on file','2 (RUN, ZS)'],['Target R-multiple','2R min'],['Avg position size','9.6% of capital'],['Typical hold','3–10 sessions']],
+				checklist: ['Price above the 20 EMA (or 50 EMA)','Consolidation range clearly marked','Volume light inside the range','Breakout volume expanding','Cutloss sized to 0.5% VAR'],
+				dos: ['Wait for the range high to break','Match EMA reference to ADX strength','Trail into fresh highs'],
+				donts: ['Chase price mid-range','Use a stop inside the range','Ignore ADX when picking the EMA'],
+				chart: { emaLabel:'20 EMA', price:'34,172 70,150 106,130 142,118 178,114 214,116 250,113 286,117 322,114 358,111 386,95 410,74 438,54 466,38 494,26 522,18 550,12 586,8', ema:'34,166 90,148 150,126 214,118 280,116 340,114 386,108 440,86 500,52 560,20 586,10', entry:{x:386,y:95,label:'Entry $37.40'}, cutlossY:128, cutlossLabel:'Cutloss $35.80', targetY:16, targetLabel:'Target $40.60 (2R)' },
+			},
+			'm-expansion-breakout': {
+				name: 'M - Expansion Breakout', category: 'Momentum', order: 'Long',
+				sourceNote: 'Derived — framework-based on the course\u2019s magnitude/pause/ADX structure; illustrative example, not a documented course case study.', derived: true,
+				description: 'Daily range and volume contract for several sessions, squeezing volatility to a multi-week low. The Expansion Breakout triggers when that contraction suddenly releases — a wide-range day closes above the contraction high on a sharp pickup in volume.',
+				conditions: [
+					['Price above the 10 EMA', 'Basic trend filter'],
+					['Multi-session range contraction', 'Daily range/ATR narrowing for 5+ sessions'],
+					['Volume dries up', 'Below-average volume during the squeeze'],
+					['Expansion day', 'Wide-range close above the contraction high'],
+					['Volume spikes on the break', 'Confirms genuine expansion, not a false start'],
+				],
+				steps: [
+					['Track volatility', 'Watch daily range/ATR contract over several sessions.'],
+					['Mark the squeeze', 'Define the high/low of the contraction zone.'],
+					['Wait for expansion', 'Look for a wide-range day pressing the contraction high.'],
+					['Enter on the break', 'Buy on the close above the contraction high.'],
+					['Place the cutloss', 'Sell stop below the contraction low.'],
+					['Manage the target', 'Sell ≥50% at 2R; trail the remainder.'],
+				],
+				params: { entry:'$54.20 — close above the contraction high', cutloss:'$51.40 — break of the contraction low', target:'$59.80 — 2R, sell ≥50% then trail', rr:'2R min ($2.80 risk vs $5.60 reward)', timeframe:'Daily chart, hold 3–8 sessions', order:'Long', sizing:'VAR 0.5% of capital ÷ risk per share', varPct:'0.5% ($500 per $100k)' },
+				stats: [['Case studies on file','0 — illustrative only'],['Target R-multiple','2R min'],['Avg position size','~8% of capital (illustrative)'],['Typical hold','3–8 sessions']],
+				checklist: ['Range/ATR contracting for 5+ sessions','Contraction high/low marked','Volume below average in the squeeze','Expansion-day volume confirmed','Cutloss sized to 0.5% VAR'],
+				dos: ['Wait for the contraction to fully form','Size the stop off the contraction low','Confirm volume on the break'],
+				donts: ['Anticipate the break before it closes','Use a loose stop inside the squeeze','Trade a squeeze with rising volume (not contracting)'],
+				chart: { emaLabel:'10 EMA', price:'34,140 76,134 118,138 160,132 202,136 244,130 286,134 328,128 370,132 412,122 454,96 496,62 538,32 586,10', ema:'34,150 150,144 286,140 412,134 454,100 538,40 586,12', entry:{x:412,y:122,label:'Entry $54.20'}, cutlossY:146, cutlossLabel:'Cutloss $51.40', targetY:14, targetLabel:'Target $59.80 (2R)' },
+			},
+			'm-slingshot': {
+				name: 'M - Slingshot', category: 'Momentum', order: 'Long',
+				sourceNote: 'Documented — Caylum Trading Institute Momentum Trading course &amp; case study (LVGO, NIU).', derived: false,
+				description: 'After a high-volatility \u2018magnitude\u2019 day, price pauses in a narrow, quiet range for one or more sessions. The Slingshot triggers when price breaks above that pause range on expanding volume — ADX strength is not required, the breakout itself confirms momentum.',
+				conditions: [
+					['Price above the 10 EMA', 'Basic trend filter'],
+					['Prior magnitude day', 'Expanded volume and wide MACD bands'],
+					['Pause day(s)', 'Narrow, quiet consolidation after the magnitude move'],
+					['Volume expands on the breakout', 'Confirms the move is real'],
+					['ADX not required', 'Can trigger even with ADX < 30'],
+				],
+				steps: [
+					['Spot the magnitude day', 'A high-volatility day with expanded volume and wide MACD bands.'],
+					['Watch the pause', 'Mark the high/low of the quiet consolidation that follows.'],
+					['Set the buy order', 'Place it just above the pause day high.'],
+					['Enter on the break', 'Fill triggers when price clears the pause high.'],
+					['Place the cutloss', 'Sell stop at the pause day low.'],
+					['Manage the target', 'Sell ≥50% at 2R; trail the remainder on daily invalidation.'],
+				],
+				params: { entry:'$34.20 — break of the pause-day high', cutloss:'$31.70 — break of the pause-day low', target:'$39.20 — 2R, sell ≥50% then trail', rr:'2R min ($2.50 risk vs $5.00 reward)', timeframe:'Daily chart, hold 3–8 sessions', order:'Long', sizing:'VAR 0.5% of capital ÷ risk per share', varPct:'0.5% ($500 per $100k)' },
+				stats: [['Case studies on file','2 (LVGO, NIU)'],['Target R-multiple','2R min'],['Avg position size','8.2% of capital'],['Typical hold','3–8 sessions']],
+				checklist: ['Magnitude day identified','Pause range marked','Price holding above the 10 EMA','Breakout volume expanding','Cutloss sized to 0.5% VAR'],
+				dos: ['Wait for the pause range to break','Confirm volume expansion on the trigger day','Take ≥50% off at 2R'],
+				donts: ['Enter during the pause before the break','Chase an extended breakout candle','Ignore the daily invalidation trail'],
+				chart: { emaLabel:'10 EMA', price:'34,206 76,178 118,140 160,104 202,78 244,62 286,66 328,60 370,64 412,40 454,20 496,8 538,6 586,2', ema:'34,214 118,170 202,120 286,70 370,62 454,26 586,4', entry:{x:370,y:64,label:'Entry $34.20'}, cutlossY:70, cutlossLabel:'Cutloss $31.70', targetY:10, targetLabel:'Target $39.20 (2R)' },
+			},
+			'm-jack-in-the-box': {
+				name: 'M - Jack in the Box', category: 'Momentum', order: 'Long',
+				sourceNote: 'Derived — framework-based, named for its tight micro-base and explosive release; illustrative example, not a documented course case study.', derived: true,
+				description: 'An extremely tight, multi-day micro-base forms — narrower than a typical pause — then \u2018pops\u2019 with a sudden, forceful breakout. The tight base means risk per share is unusually small, so targets are extended further in R terms.',
+				conditions: [
+					['Price above the 10 EMA', 'Basic trend filter'],
+					['Micro-base of 3+ inside days', 'Very narrow daily ranges stacked together'],
+					['Volume quiet inside the base', 'Minimal participation while coiling'],
+					['Sharp breakout candle', 'Wide range closing well above the base high'],
+					['Tight risk', 'Base range is unusually small relative to price'],
+				],
+				steps: [
+					['Spot the micro-base', 'Three or more tight, overlapping inside days.'],
+					['Mark the base high/low', 'Define the narrow range precisely.'],
+					['Set the buy order', 'Place just above the base high.'],
+					['Enter on the break', 'Fill triggers on the pop above the base.'],
+					['Place the cutloss', 'Sell stop below the base low (tight risk).'],
+					['Manage the target', 'Extend to 3R given the tight stop; trail the remainder.'],
+				],
+				params: { entry:'$28.90 — break of the micro-base high', cutloss:'$28.10 — break of the micro-base low', target:'$31.30 — 3R given the tight stop', rr:'3R target ($0.80 risk vs $2.40 reward)', timeframe:'Daily chart, hold 2–6 sessions', order:'Long', sizing:'VAR 0.5% of capital ÷ risk per share', varPct:'0.5% ($500 per $100k)' },
+				stats: [['Case studies on file','0 — illustrative only'],['Target R-multiple','3R'],['Avg position size','~6% of capital (illustrative)'],['Typical hold','2–6 sessions']],
+				checklist: ['Three or more tight inside days','Base high/low marked precisely','Volume quiet inside the base','Breakout candle wide-range','Cutloss sized to 0.5% VAR'],
+				dos: ['Confirm the base is unusually tight before sizing up','Use the small risk to extend the target','Act quickly once the pop triggers'],
+				donts: ['Mistake a normal pause for a micro-base','Oversize the position just because the stop is tight','Chase the move after it has already extended'],
+				chart: { emaLabel:'10 EMA', price:'34,150 90,148 146,150 202,147 258,149 314,147 358,146 388,104 416,62 444,28 472,8 520,4 586,2', ema:'34,152 150,150 258,149 358,148 388,118 444,46 520,10 586,2', entry:{x:358,y:146,label:'Entry $28.90'}, cutlossY:152, cutlossLabel:'Cutloss $28.10', targetY:10, targetLabel:'Target $31.30 (3R)' },
+			},
+			'm-180-degrees': {
+				name: 'M - 180 Degrees', category: 'Momentum', order: 'Long',
+				sourceNote: 'Derived — framework-based reversal concept named for a full trend reversal; illustrative example, not a documented course case study.', derived: true,
+				description: 'Price makes an extended, climactic move in one direction, then reverses hard on a single wide-range day (a one-day reversal). The 180 Degrees setup enters on confirmation of that reversal, betting the extreme has exhausted the prior trend.',
+				conditions: [
+					['Extended prior move', 'Price climactic / stretched from the 10 EMA'],
+					['One-day reversal (ODR)', 'A wide-range day closing opposite the prior trend'],
+					['Volume spike on the reversal day', 'Confirms participation at the extreme'],
+					['Confirmation candle', 'The next session holds above the reversal day\u2019s low'],
+					['Target toward the mean', 'Prior base or the 10/20 EMA as first reference'],
+				],
+				steps: [
+					['Identify the climactic extreme', 'Price stretched well away from the 10 EMA.'],
+					['Watch for the ODR', 'A wide-range reversal day on high volume.'],
+					['Wait for confirmation', 'Next session should hold the reversal day\u2019s range.'],
+					['Enter on the break', 'Buy above the reversal (or confirmation) day\u2019s high.'],
+					['Place the cutloss', 'Sell stop below the extreme low.'],
+					['Manage the target', 'First target the prior base / 10–20 EMA, then trail.'],
+				],
+				params: { entry:'$46.60 — break above the reversal-day high', cutloss:'$41.90 — below the climactic extreme', target:'$55.00 — reclaim of the prior base', rr:'~1.8R ($4.70 risk vs $8.40 reward)', timeframe:'Daily chart, hold 3–10 sessions', order:'Long', sizing:'VAR 0.5% of capital ÷ risk per share', varPct:'0.5% ($500 per $100k)' },
+				stats: [['Case studies on file','0 — illustrative only'],['Target R-multiple','~2R'],['Avg position size','~7% of capital (illustrative)'],['Typical hold','3–10 sessions']],
+				checklist: ['Climactic extended move identified','One-day reversal confirmed on volume','Next session holds the range','Cutloss placed beyond the extreme','Cutloss sized to 0.5% VAR'],
+				dos: ['Wait for the confirmation candle, not just the reversal day','Place the stop beyond the true extreme','Target the mean first, then trail'],
+				donts: ['Catch the reversal day itself before confirmation','Use a stop inside the reversal range','Assume every ODR marks a full trend change'],
+				chart: { emaLabel:'10 EMA', price:'34,36 76,58 118,86 160,116 202,146 244,172 286,196 328,212 370,160 412,118 454,86 496,60 538,38 586,20', ema:'34,48 160,120 286,198 328,210 412,150 496,70 586,24', entry:{x:412,y:118,label:'Entry $46.60'}, cutlossY:216, cutlossLabel:'Cutloss $41.90', targetY:28, targetLabel:'Target $55.00' },
+			},
+			'm-boomer': {
+				name: 'M - Boomer', category: 'Momentum', order: 'Long',
+				sourceNote: 'Documented — Caylum Trading Institute Momentum Trading course &amp; case study (AMD, WIX).', derived: false,
+				description: 'The Boomer is the Slingshot\u2019s stronger sibling: the same magnitude-day-then-pause structure, but it only triggers when ADX > 30 confirms a genuinely strong trend. That extra confirmation lets positions run further before the first profit-taking exit.',
+				conditions: [
+					['ADX > 30 required', 'The key differentiator from the Slingshot'],
+					['DMI+ > DMI-', 'Confirms uptrend directional strength'],
+					['Price above the 10 EMA', 'Basic trend filter'],
+					['Prior magnitude day', 'Expanded volume and overbought MACD'],
+					['Pause day(s) forming', 'Quiet consolidation after the magnitude move'],
+				],
+				steps: [
+					['Confirm ADX > 30', 'Strong trend must already be in place.'],
+					['Spot the magnitude day', 'Expanded volume, overbought MACD.'],
+					['Watch the pause', 'Mark the high/low of the consolidation.'],
+					['Enter on the break', 'Buy above the pause day high, with ADX still > 30.'],
+					['Place the cutloss', 'Sell stop at the pause day low.'],
+					['Manage the target', 'Sell ≥50% at 2R; trail the remainder, extend on continued momentum.'],
+				],
+				params: { entry:'$79.00 — break of the pause-day high (ADX > 30)', cutloss:'$75.50 — break of the pause-day low', target:'$86.00 — 2R, sell ≥50% then trail', rr:'2R min ($3.50 risk vs $7.00 reward)', timeframe:'Daily chart, hold 3–8 sessions', order:'Long', sizing:'VAR 0.5% of capital ÷ risk per share', varPct:'0.5% ($500 per $100k)' },
+				stats: [['Case studies on file','2 (AMD, WIX)'],['Target R-multiple','2R min (extendable)'],['Avg position size','10.5% of capital'],['Typical hold','3–8 sessions']],
+				checklist: ['ADX reading above 30','DMI+ above DMI-','Magnitude day identified','Pause range marked','Cutloss sized to 0.5% VAR'],
+				dos: ['Confirm ADX > 30 before entering','Wait for the pause range to break','Let strong moves extend past 2R'],
+				donts: ['Trade it with ADX < 30 (use Slingshot instead)','Enter before the pause range breaks','Cut the trail short on normal pullbacks'],
+				chart: { emaLabel:'10 EMA · ADX > 30', price:'34,210 70,186 106,156 142,128 178,106 214,92 250,86 286,90 322,84 358,66 394,48 430,42 466,46 502,28 538,12 586,2', ema:'34,218 142,160 250,96 358,70 466,48 586,4', entry:{x:466,y:44,label:'Entry $79.00'}, cutlossY:52, cutlossLabel:'Cutloss $75.50', targetY:8, targetLabel:'Target $86.00 (2R)' },
+			},
+			'm-123-pullback': {
+				name: 'M - 1,2,3 Pullback', category: 'Momentum', order: 'Long',
+				sourceNote: 'Derived — framework-based on the classic three-push pullback structure; illustrative example, not a documented course case study.', derived: true,
+				description: 'Within an uptrend, price pulls back in three distinct legs (push 1, push 2, push 3), each finding a slightly lower low before a small bounce. The setup triggers once the third and final pullback leg bases and breaks back to the upside, confirming the pullback is complete.',
+				conditions: [
+					['Primary uptrend intact', 'Higher highs / higher lows on the larger timeframe'],
+					['Three distinct pullback legs', 'Each with its own minor low and bounce'],
+					['Diminishing momentum on each leg', 'Smaller range / lighter volume by the third leg'],
+					['Base forms at leg three', 'A brief consolidation at the final, lowest leg'],
+					['Price above the 10 EMA on the break', 'Confirms trend resumption'],
+				],
+				steps: [
+					['Count the legs', 'Identify pushes 1, 2, and 3 within the pullback.'],
+					['Wait for leg three to base', 'Look for a brief consolidation at the final low.'],
+					['Mark the base range', 'Define the high/low of that consolidation.'],
+					['Enter on the break', 'Buy above the base high.'],
+					['Place the cutloss', 'Sell stop below leg three\u2019s low.'],
+					['Manage the target', 'Sell ≥50% at 2R; trail the remainder into new highs.'],
+				],
+				params: { entry:'$67.30 — break of the leg-three base high', cutloss:'$63.80 — below leg three\u2019s low', target:'$74.30 — 2R, sell ≥50% then trail', rr:'2R min ($3.50 risk vs $7.00 reward)', timeframe:'Daily chart, hold 4–10 sessions', order:'Long', sizing:'VAR 0.5% of capital ÷ risk per share', varPct:'0.5% ($500 per $100k)' },
+				stats: [['Case studies on file','0 — illustrative only'],['Target R-multiple','2R min'],['Avg position size','~8% of capital (illustrative)'],['Typical hold','4–10 sessions']],
+				checklist: ['Three pullback legs identified','Momentum diminishing by leg three','Base formed at the final low','Price reclaims the 10 EMA on the break','Cutloss sized to 0.5% VAR'],
+				dos: ['Wait for all three legs to complete','Confirm diminishing range/volume into leg three','Size the stop off leg three\u2019s low'],
+				donts: ['Enter on leg one or two, expecting the bounce to hold','Assume two legs is enough confirmation','Ignore a leg three that breaks the uptrend structure'],
+				chart: { emaLabel:'10 EMA', price:'34,198 76,158 118,126 150,146 182,130 214,152 246,138 278,160 310,148 342,148 374,122 416,92 458,62 500,36 542,16 586,4', ema:'34,206 118,160 214,150 278,158 342,150 374,138 458,70 542,20 586,4', entry:{x:374,y:122,label:'Entry $67.30'}, cutlossY:164, cutlossLabel:'Cutloss $63.80', targetY:20, targetLabel:'Target $74.30 (2R)' },
+			},
+			'p-coil': {
+				name: 'P - Coil', category: 'Position', order: 'Long',
+				sourceNote: 'Documented — Caylum Trading Institute Position Trading course &amp; case study (PRLB, SPOT) — the \u2018Falling Coil\u2019 pattern.', derived: false,
+				description: 'Price grinds lower for 4–8 weeks inside a descending channel, printing a series of lower highs along a diagonal resistance line while MACD settles near zero. The Coil triggers when price finally breaks above that diagonal resistance, reversing the grind.',
+				conditions: [
+					['4–8 week duration', 'Diagonal, descending consolidation after a prior move'],
+					['Lower highs forming a diagonal', 'Clear descending resistance line to draw'],
+					['MACD near zero', 'Momentum neutral, digesting the prior move'],
+					['Volume decreasing', 'Confirms acceptance at progressively lower prices'],
+					['Price above the 20/50 EMA stack on the break', 'Confirms the reversal'],
+				],
+				steps: [
+					['Identify the descending channel', '4–8 weeks of lower highs and lower lows.'],
+					['Draw the diagonal resistance', 'Connect the sequence of lower highs.'],
+					['Confirm MACD near zero', 'Momentum should be neutral, not extended.'],
+					['Enter on the break', 'Buy on the close above the diagonal resistance.'],
+					['Place the cutloss', 'Sell stop at the duration low (the lowest point of the channel).'],
+					['Manage the target', 'Sell 50% at 2R, remainder at 4R; trail to the 10 EMA.'],
+				],
+				params: { entry:'$115.20 — close above the diagonal resistance', cutloss:'$106.70 — break of the duration low', target:'$132.20 — 2R (50%), $149.20 — 4R (remainder)', rr:'2R / 4R split ($8.50 risk)', timeframe:'Weekly chart, hold 4–10 weeks', order:'Long', sizing:'VAR 1% of capital ÷ risk per share', varPct:'1% ($1,000 per $100k)' },
+				stats: [['Case studies on file','2 (PRLB, SPOT)'],['Target R-multiple','2R / 4R split'],['Avg position size','14.1% of capital'],['Typical hold','4–10 weeks']],
+				checklist: ['4–8 week descending channel identified','Diagonal resistance line drawn','MACD sitting near zero','Volume decreasing through the channel','Cutloss sized to 1% VAR'],
+				dos: ['Wait for the full duration to form before acting','Draw the diagonal off actual swing highs','Split the exit between 2R and 4R'],
+				donts: ['Buy mid-channel before the diagonal breaks','Use a stop above the duration low','Treat it the same as a flat/horizontal coil'],
+				chart: { emaLabel:'20 EMA', price:'34,86 76,108 118,98 160,120 202,110 244,130 286,118 328,138 370,128 412,146 454,108 496,78 538,50 586,20', ema:'34,94 160,116 286,128 412,142 454,120 538,56 586,22', entry:{x:454,y:108,label:'Entry $115.20'}, cutlossY:150, cutlossLabel:'Cutloss $106.70', targetY:24, targetLabel:'Target $132.20 (2R)' },
+			},
+			'p-base0-duration': {
+				name: 'P - Base 0 Duration', category: 'Position', order: 'Long',
+				sourceNote: 'Documented — Caylum Trading Institute Position Trading course &amp; case study (NET, NTRA) — the \u2018Flat Coil\u2019 pattern.', derived: false,
+				description: 'Price ranges sideways in a horizontal band for 4–8 weeks while MACD sits at its zero-line base, signalling buyers and sellers have reached equilibrium. The setup triggers when price finally closes above the horizontal resistance of that range.',
+				conditions: [
+					['4–8 week horizontal duration', 'Flat, non-trending consolidation'],
+					['MACD at zero base', 'Momentum fully neutral through the range'],
+					['Clear horizontal resistance', 'Defined upper boundary to the range'],
+					['Volume decreasing', 'Confirms acceptance of the range as equilibrium'],
+					['Price above the 20/50 EMA stack on the break', 'Confirms new directional move'],
+				],
+				steps: [
+					['Identify the horizontal range', '4–8 weeks trading sideways with no net trend.'],
+					['Draw the resistance line', 'Mark the consolidation high.'],
+					['Confirm MACD at zero', 'Momentum should be flat, not trending either way.'],
+					['Enter on the break', 'Buy on the close above the horizontal resistance.'],
+					['Place the cutloss', 'Sell stop at the duration low.'],
+					['Manage the target', 'Sell 50% at 2R, remainder at 4R; trail to the 10 EMA.'],
+				],
+				params: { entry:'$30.00 — close above the horizontal resistance', cutloss:'$26.00 — break of the duration low', target:'$38.00 — 2R (50%), $46.00 — 4R (remainder)', rr:'2R / 4R split ($4.00 risk)', timeframe:'Weekly chart, hold 4–10 weeks', order:'Long', sizing:'VAR 1% of capital ÷ risk per share', varPct:'1% ($1,000 per $100k)' },
+				stats: [['Case studies on file','2 (NET, NTRA)'],['Target R-multiple','2R / 4R split'],['Avg position size','9.1% of capital'],['Typical hold','4–10 weeks']],
+				checklist: ['4–8 week flat range identified','Horizontal resistance drawn at the range high','MACD sitting at the zero base','Volume decreasing through the range','Cutloss sized to 1% VAR'],
+				dos: ['Confirm the range is truly flat, not drifting','Wait for a decisive close above resistance','Split the exit between 2R and 4R'],
+				donts: ['Buy a range that is still trending diagonally','Anticipate the breakout before the close confirms it','Use a stop inside the range'],
+				chart: { emaLabel:'20 EMA · MACD ≈ 0', price:'34,118 76,114 118,122 160,116 202,124 244,116 286,122 328,114 370,120 412,116 454,92 496,66 538,42 586,16', ema:'34,120 150,118 286,120 412,118 454,104 538,54 586,18', entry:{x:454,y:92,label:'Entry $30.00'}, cutlossY:130, cutlossLabel:'Cutloss $26.00', targetY:20, targetLabel:'Target $38.00 (2R)' },
+			},
+			'c-capitulation': {
+				name: 'C - Capitulation', category: 'Capitulation', order: 'Long',
+				sourceNote: 'Derived — general market-timing concept adapted to the house VAR/EMA framework; illustrative example, not a documented course case study.', derived: true,
+				description: 'A sharp, high-volume sell-off drives price to a climactic low — a panic \u2018capitulation\u2019 day. The setup triggers on confirmation that sellers are exhausted: a strong reversal day followed by a break of that reversal day\u2019s high.',
+				conditions: [
+					['Climactic sell-off', 'Large range-down day on volume ≥ 2–3x average'],
+					['Test of major support', 'Often the 200 EMA or a prior multi-month low'],
+					['Reversal candle forms', 'Hammer / bullish engulfing at the low'],
+					['Volume remains elevated', 'Confirms heavy two-way participation at the low'],
+					['Confirmation break', 'Next session clears the reversal candle\u2019s high'],
+				],
+				steps: [
+					['Spot the capitulation day', 'Large range, volume ≥ 2–3x average, near major support.'],
+					['Watch for the reversal candle', 'Hammer or bullish engulfing forming at the low.'],
+					['Wait for confirmation', 'Do not buy the capitulation day itself.'],
+					['Enter on the break', 'Buy above the reversal candle\u2019s high.'],
+					['Place the cutloss', 'Sell stop below the capitulation low.'],
+					['Manage the target', 'First target the 10/20 EMA reclaim, then the prior swing high.'],
+				],
+				params: { entry:'$22.40 — break above the reversal-candle high', cutloss:'$18.90 — below the capitulation low', target:'$29.40 — 2R, first into the 10/20 EMA reclaim', rr:'2R min ($3.50 risk vs $7.00 reward)', timeframe:'Daily chart, hold 3–10 sessions', order:'Long', sizing:'VAR 0.5% of capital ÷ risk per share', varPct:'0.5% ($500 per $100k)' },
+				stats: [['Case studies on file','0 — illustrative only'],['Target R-multiple','2R min'],['Avg position size','~7.5% of capital (illustrative)'],['Typical hold','3–10 sessions']],
+				checklist: ['Volume ≥ 2–3x average on the sell-off','Price testing major support','Reversal candle confirmed at the low','Next session holds above the reversal low','Cutloss sized to 0.5% VAR'],
+				dos: ['Wait for confirmation, never buy the panic day itself','Size the stop below the true capitulation low','Scale out into the first reclaim'],
+				donts: ['Try to pick the exact bottom','Use a stop that sits inside the capitulation range','Ignore volume — low-volume \u2018capitulation\u2019 is usually a trap'],
+				chart: { emaLabel:'20 EMA', price:'34,38 76,62 118,92 160,124 202,156 244,186 286,210 328,166 370,146 412,128 454,104 496,80 538,56 586,30', ema:'34,48 160,130 286,205 328,180 412,130 496,80 586,34', entry:{x:328,y:162,label:'Entry $22.40'}, cutlossY:214, cutlossLabel:'Cutloss $18.90', targetY:36, targetLabel:'Target $29.40 (2R)' },
+			},
+			'c-square-root': {
+				name: 'C - Square Root', category: 'Capitulation', order: 'Long',
+				sourceNote: 'Derived — named for the chart\u2019s square-root-like shape (sharp drop, flat base, gradual rise); illustrative example, not a documented course case study.', derived: true,
+				description: 'After a sharp decline, price carves out a long, flattening rounding bottom rather than a sharp V-reversal, then slowly grinds higher — tracing a shape similar to a square-root curve. The setup triggers when price breaks the declining resistance (the \u2018neckline\u2019) of that rounding base.',
+				conditions: [
+					['Prior sharp decline', 'A clear down-leg precedes the base'],
+					['Long rounding base', 'Multi-week flattening, not a sharp V'],
+					['Declining neckline resistance', 'A gently downward-sloping resistance to draw across the base'],
+					['Volume bottoms mid-base', 'Lowest volume near the middle of the rounding pattern'],
+					['Base is wider than it is deep by the end', 'Flattening slope confirms basing, not further decline'],
+				],
+				steps: [
+					['Confirm the prior decline', 'A sharp down-leg should precede the base.'],
+					['Track the rounding base', 'Multi-week flattening with higher lows forming slowly.'],
+					['Draw the neckline', 'A gently declining resistance line across the base\u2019s highs.'],
+					['Enter on the break', 'Buy on the close above the neckline.'],
+					['Place the cutloss', 'Sell stop below the rounding base\u2019s low.'],
+					['Manage the target', 'Project a measured move from the base depth; sell 50% at 2R, trail the rest.'],
+				],
+				params: { entry:'$41.80 — close above the declining neckline', cutloss:'$37.20 — below the rounding base low', target:'$51.00 — 2R (50%), $56.40 — 3R (remainder)', rr:'2R / 3R split ($4.60 risk)', timeframe:'Weekly chart, hold 6–12 weeks', order:'Long', sizing:'VAR 1% of capital ÷ risk per share', varPct:'1% ($1,000 per $100k)' },
+				stats: [['Case studies on file','0 — illustrative only'],['Target R-multiple','2R / 3R split'],['Avg position size','~9% of capital (illustrative)'],['Typical hold','6–12 weeks']],
+				checklist: ['Sharp prior decline confirmed','Rounding base spans multiple weeks','Neckline drawn across the base highs','Volume troughs near the base midpoint','Cutloss sized to 1% VAR'],
+				dos: ['Let the base fully round before acting','Draw the neckline with a gentle downward slope, not flat','Size the stop below the whole base, not a recent swing'],
+				donts: ['Mistake a brief pause for a full rounding base','Buy before the neckline actually breaks','Expect a V-shaped, fast recovery'],
+				chart: { emaLabel:'50 EMA', price:'34,28 70,58 106,94 142,128 178,158 214,182 250,196 286,202 322,204 358,202 394,200 430,186 466,160 502,128 538,92 586,50', ema:'34,40 142,130 250,198 358,204 430,196 502,140 586,56', entry:{x:430,y:186,label:'Entry $41.80'}, cutlossY:208, cutlossLabel:'Cutloss $37.20', targetY:56, targetLabel:'Target $51.00 (2R)' },
+			},
+		};
+
+		const CATEGORY_CLASS = { Swing:'cat-swing', Momentum:'cat-momentum', Position:'cat-position', Capitulation:'cat-capitulation' };
+
+		function renderChart(c) {
+			return `<svg viewBox="0 0 600 230" preserveAspectRatio="none" aria-label="Sample price chart showing entry, cutloss, and target">
+				<g>
+					<line class="chart-grid" x1="34" y1="26" x2="586" y2="26"/>
+					<line class="chart-grid" x1="34" y1="66" x2="586" y2="66"/>
+					<line class="chart-grid" x1="34" y1="106" x2="586" y2="106"/>
+					<line class="chart-grid" x1="34" y1="146" x2="586" y2="146"/>
+					<line class="chart-grid" x1="34" y1="186" x2="586" y2="186"/>
+				</g>
+				<line class="target-line" x1="34" y1="${c.targetY}" x2="586" y2="${c.targetY}"/>
+				<line class="cutloss-line" x1="34" y1="${c.cutlossY}" x2="586" y2="${c.cutlossY}"/>
+				<line class="entry-line" x1="${c.entry.x}" y1="4" x2="${c.entry.x}" y2="226"/>
+				<polyline class="ema-line" points="${c.ema}"/>
+				<polyline class="price-line" points="${c.price}"/>
+				<circle cx="${c.entry.x}" cy="${c.entry.y}" r="4.5" fill="var(--amber)"/>
+				<circle cx="${c.entry.x}" cy="${c.entry.y}" r="9" fill="var(--amber)" opacity=".2"/>
+				<text x="40" y="${c.targetY - 5}" fill="#31d7c4" font-weight="700">${c.targetLabel}</text>
+				<text x="40" y="${c.cutlossY - 5}" fill="#ff8095" font-weight="700">${c.cutlossLabel}</text>
+				<text x="${c.entry.x + 6}" y="${c.entry.y - 6}" fill="#ffcf85" font-weight="700">${c.entry.label}</text>
+			</svg>
+			<div class="chart-legend">
+				<div class="legend-item"><span class="legend-swatch" style="background:#ddd5e9"></span>Price</div>
+				<div class="legend-item"><span class="legend-swatch" style="background:var(--cyan)"></span>${c.emaLabel}</div>
+				<div class="legend-item"><span class="legend-dot" style="background:var(--amber)"></span>Entry trigger</div>
+				<div class="legend-item"><span class="legend-swatch" style="background:var(--red)"></span>Cutloss</div>
+				<div class="legend-item"><span class="legend-swatch" style="background:var(--green)"></span>Target</div>
+			</div>`;
+		}
+
+		function render(key) {
+			const s = SETUPS[key];
+			document.getElementById('setup-picker').value = key;
+			document.getElementById('setup-name').textContent = s.name;
+			document.getElementById('setup-sub').textContent = `${s.category} · ${s.order} · ${s.derived ? 'Framework-derived entry' : 'Course-documented entry'}`;
+			const badge = document.getElementById('setup-badge');
+			badge.textContent = s.category;
+			badge.className = 'panel-badge ' + CATEGORY_CLASS[s.category];
+			const note = document.getElementById('source-note');
+			note.className = 'source-note' + (s.derived ? ' derived' : '');
+			document.getElementById('source-note-text').innerHTML = s.sourceNote;
+			document.getElementById('setup-desc').textContent = s.description;
+			document.getElementById('condition-list').innerHTML = s.conditions.map(([t, d]) => `<article class="condition"><i>✓</i><div><span>${t}</span><small>${d}</small></div></article>`).join('');
+			document.getElementById('chart-container').innerHTML = renderChart(s.chart);
+			document.getElementById('step-list').innerHTML = s.steps.map(([t, d], i) => `<li class="step"><span class="step-num">${i + 1}</span><div><strong>${t}</strong><p>${d}</p></div></li>`).join('');
+			const p = s.params;
+			document.getElementById('params-grid').innerHTML = `
+				<div class="field"><label>Entry trigger</label><input class="input-positive" value="${p.entry}" readonly></div>
+				<div class="field"><label>Cutloss</label><input class="input-negative" value="${p.cutloss}" readonly></div>
+				<div class="field"><label>Target</label><input value="${p.target}" readonly></div>
+				<div class="field"><label>Risk / reward</label><input value="${p.rr}" readonly></div>
+				<div class="field"><label>Timeframe</label><input value="${p.timeframe}" readonly></div>
+				<div class="field"><label>Order type</label><input value="${p.order}" readonly></div>
+				<div class="field"><label>Position sizing</label><input value="${p.sizing}" readonly></div>
+				<div class="field"><label>VAR</label><input value="${p.varPct}" readonly></div>`;
+			document.getElementById('stats-sub').textContent = `Historical results for ${s.name}`;
+			document.getElementById('stats-grid').innerHTML = s.stats.map(([label, value]) => `<div class="summary-metric"><span>${label}</span><strong>${value}</strong></div>`).join('');
+			document.getElementById('checklist').innerHTML = s.checklist.map(item => `<button class="check-item" type="button"><span class="box">✓</span><span>${item}</span></button>`).join('');
+			document.getElementById('do-list').innerHTML = s.dos.map(item => `<li>${item}</li>`).join('');
+			document.getElementById('dont-list').innerHTML = s.donts.map(item => `<li>${item}</li>`).join('');
+			document.getElementById('related-chips').innerHTML = Object.keys(SETUPS).filter(k => SETUPS[k].category === s.category).map(k => `<button class="chip${k === key ? ' active' : ''}" data-key="${k}">${SETUPS[k].name}</button>`).join('');
+		}
+
+		document.getElementById('setup-picker').addEventListener('change', event => render(event.currentTarget.value));
+		document.getElementById('related-chips').addEventListener('click', event => { const chip = event.target.closest('.chip'); if (chip) render(chip.dataset.key); });
+		document.getElementById('checklist').addEventListener('click', event => { const item = event.target.closest('.check-item'); if (item) item.classList.toggle('checked'); });
+		document.getElementById('print-playbook').addEventListener('click', event => { event.currentTarget.textContent = 'Preparing…'; setTimeout(() => event.currentTarget.textContent = 'Print Playbook', 1000); });
+		document.getElementById('edit-configuration').addEventListener('click', event => { event.currentTarget.textContent = 'Opening…'; setTimeout(() => event.currentTarget.textContent = 'Edit in Configuration', 1000); });
+
+		render('s-pullback');
+	</script>
+</body>
+</html>

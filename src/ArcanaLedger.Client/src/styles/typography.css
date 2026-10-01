@@ -1,16 +1,17 @@
 .app,
 .login-page,
 .create-account-page {
-  font-size: 13px;
+  font-size: 15px;
+  line-height: 1.5;
 }
 
-.nav-label { font-size: 12px; }
-.page-title { font-size: 11px; }
+.nav-label { font-size: 14px; }
+.page-title { font-size: 13px; }
 .topbar .page-title { padding-left: 30px; }
-.search input { font-size: 11px; }
-.avatar { font-size: 12px; }
-.eyebrow { font-size: 9px; }
-.welcome p { font-size: 11px; }
+.search input { font-size: 13px; }
+.avatar { font-size: 14px; }
+.eyebrow { font-size: 11px; }
+.welcome p { font-size: 13px; }
 .section-head p,
 .link-button,
 .stat span,
@@ -21,16 +22,16 @@
 .action-status,
 .activity-row,
 .activity-row time,
-.chart-label { font-size: 10px; }
+ .chart-label { font-size: 12px; }
 .section-head h2 { font-size: 14px; }
 .name,
-.activity-row strong { font-size: 11px; }
-.quote { font-size: 11px; }
+.activity-row strong { font-size: 13px; }
+.quote { font-size: 13px; }
 
 .page-heading p,
 .login-form-intro,
-.create-account-form-intro { font-size: 11px; }
-.page-heading h1 { font-size: 23px; }
+.create-account-form-intro { font-size: 13px; }
+.page-heading h1 { font-size: 24px; }
 .panel-head h2,
 .configuration-layout .panel-head h2,
 .configuration-layout .panel h2,
@@ -40,7 +41,7 @@
 .configuration-layout .panel-head p,
 .valuation-layout .panel-head p,
 .form-head p,
-.summary p { font-size: 10px; }
+.summary p { font-size: 12px; }
 .ghost,
 .primary,
 .filter,
@@ -69,26 +70,59 @@
 .metric span,
 .rule span,
 .option,
-.var-row { font-size: 10px; }
+ .var-row { font-size: 12px; }
 .trade-symbol,
-.stock-symbol { font-size: 11px; }
+.stock-symbol { font-size: 13px; }
 .trade-name,
-.trade-quote { font-size: 12px; }
-.stock-name { font-size: 11px; }
-.stock-sector { font-size: 10px; }
-.stock-price { font-size: 11px; }
-.forecast { font-size: 11px; }
-.summary-line strong { font-size: 12px; }
-.section-title { font-size: 11px; }
+.trade-quote { font-size: 14px; }
+.stock-name { font-size: 13px; }
+.stock-sector { font-size: 12px; }
+.stock-price { font-size: 13px; }
+.forecast { font-size: 13px; }
+.summary-line strong { font-size: 14px; }
+.section-title { font-size: 13px; }
 
 .login-eyebrow,
 .create-account-eyebrow,
 .login-divider,
 .create-account-divider,
 .login-brand-footer,
-.create-account-brand-footer { font-size: 10px; }
+.create-account-brand-footer { font-size: 11px; }
 .login-brand-copy,
-.create-account-brand-copy { font-size: 13px; }
+.create-account-brand-copy { font-size: 15px; }
+
+.field label,
+.control-label,
+.panel-badge,
+.badge,
+.status,
+.note,
+.footer-note,
+.table-note,
+.trade-meta,
+.trade-points,
+.trade-quote small,
+.summary-line,
+.metric span,
+.rule span,
+.option,
+.setup-playbook-link,
+.playbook-grid .field label,
+.playbook-grid .panel-head p,
+.playbook-summary p,
+.control-panel > p,
+.playbook-notice,
+.playbook-chart-legend,
+.condition small,
+.step p,
+.summary-metric span,
+.check-item span,
+.do-list li,
+.dont-list li,
+.chip { font-size: 12px; }
+
+.condition strong,
+.step strong { font-size: 13px; }
 
 @media (max-width: 560px) {
   .page-heading h1 { font-size: 22px; }
