@@ -8,11 +8,11 @@ namespace ArcanaLedger.Server.Services;
 /// </summary>
 public interface IAuthService
 {
-    RegisteredUserResponse Register(RegisterRequest request, CancellationToken cancellationToken);
+    Task<RegisteredUserResponse> Register(RegisterRequest request, CancellationToken cancellationToken);
 
-    LoginResponse Login(LoginRequest request, CancellationToken cancellationToken);
+    Task<LoginResponse> Login(LoginRequest request, CancellationToken cancellationToken);
 
-    void Logout(Guid userId, CancellationToken cancellationToken);
+    Task Logout(Guid userId, CancellationToken cancellationToken);
 
-    AuthenticatedUserResponse GetCurrentUser(Guid userId, CancellationToken cancellationToken);
+    Task<AuthenticatedUserResponse> GetCurrentUser(Guid userId, CancellationToken cancellationToken);
 }

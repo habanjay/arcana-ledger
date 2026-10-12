@@ -8,11 +8,11 @@ namespace ArcanaLedger.Server.Services;
 /// </summary>
 public interface IBrokerageAccountService
 {
-    IReadOnlyList<BrokerageAccountResponse> List(Guid userId, Guid portfolioId, CancellationToken cancellationToken);
+    Task<IReadOnlyList<BrokerageAccountResponse>> List(Guid userId, Guid portfolioId, CancellationToken cancellationToken);
 
-    BrokerageAccountResponse Create(Guid userId, Guid portfolioId, CreateAccountRequest request, CancellationToken cancellationToken);
+    Task<BrokerageAccountResponse> Create(Guid userId, Guid portfolioId, CreateAccountRequest request, CancellationToken cancellationToken);
 
-    BrokerageAccountResponse Update(Guid userId, Guid portfolioId, Guid accountId, UpdateAccountRequest request, CancellationToken cancellationToken);
+    Task<BrokerageAccountResponse> Update(Guid userId, Guid portfolioId, Guid accountId, UpdateAccountRequest request, CancellationToken cancellationToken);
 
-    void Delete(Guid userId, Guid portfolioId, Guid accountId, CancellationToken cancellationToken);
+    Task Delete(Guid userId, Guid portfolioId, Guid accountId, CancellationToken cancellationToken);
 }

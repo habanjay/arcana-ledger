@@ -8,11 +8,11 @@ namespace ArcanaLedger.Server.Services;
 /// </summary>
 public interface IWatchlistService
 {
-    IReadOnlyList<WatchlistItemResponse> List(Guid userId, Guid portfolioId, CancellationToken cancellationToken);
+    Task<IReadOnlyList<WatchlistItemResponse>> List(Guid userId, Guid portfolioId, CancellationToken cancellationToken);
 
-    WatchlistItemResponse Add(Guid userId, Guid portfolioId, AddWatchlistItemRequest request, CancellationToken cancellationToken);
+    Task<WatchlistItemResponse> Add(Guid userId, Guid portfolioId, AddWatchlistItemRequest request, CancellationToken cancellationToken);
 
-    WatchlistItemResponse Reorder(Guid userId, Guid portfolioId, Guid instrumentId, UpdateWatchlistItemRequest request, CancellationToken cancellationToken);
+    Task<WatchlistItemResponse> Reorder(Guid userId, Guid portfolioId, Guid instrumentId, UpdateWatchlistItemRequest request, CancellationToken cancellationToken);
 
-    void Remove(Guid userId, Guid portfolioId, Guid instrumentId, CancellationToken cancellationToken);
+    Task Remove(Guid userId, Guid portfolioId, Guid instrumentId, CancellationToken cancellationToken);
 }

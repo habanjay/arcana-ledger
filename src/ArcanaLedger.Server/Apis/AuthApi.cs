@@ -33,7 +33,7 @@ public static class AuthApi
     {
         group.MapPost("/logout", Logout)
             .WithName("Logout")
-            .WithSummary("Revoke the current refresh token/session.")
+            .WithSummary("End the client session; the bearer token remains valid until it expires.")
             .Produces(StatusCodes.Status204NoContent);
 
         group.MapGet("/me", GetMe)
@@ -42,21 +42,21 @@ public static class AuthApi
             .Produces<AuthenticatedUserResponse>(StatusCodes.Status200OK);
     }
 
-    private static IResult Register(RegisterRequest request, IAuthService authService, CancellationToken cancellationToken)
+    private static async Task<IResult> Register(RegisterRequest request, IAuthService authService, CancellationToken cancellationToken)
     {
-        var user = authService.Register(request, cancellationToken);
+        var user = await authService.Register(request, cancellationToken);
         return Results.Created("/api/v1/auth/me", user);
     }
 
-    private static IResult Login(LoginRequest request, IAuthService authService, CancellationToken cancellationToken)
-        => Results.Ok(authService.Login(request, cancellationToken));
+    private static async Task<IResult> Login(LoginRequest request, IAuthService authService, CancellationToken cancellationToken)
+        => Results.Ok(await authService.Login(request, cancellationToken));
 
-    private static IResult Logout(ClaimsPrincipal user, IAuthService authService, CancellationToken cancellationToken)
+    private static async Task<IResult> Logout(ClaimsPrincipal user, IAuthService authService, CancellationToken cancellationToken)
     {
-        authService.Logout(user.GetUserId(), cancellationToken);
+        await authService.Logout(user.GetUserId(), cancellationToken);
         return Results.NoContent();
     }
 
-    private static IResult GetMe(ClaimsPrincipal user, IAuthService authService, CancellationToken cancellationToken)
-        => Results.Ok(authService.GetCurrentUser(user.GetUserId(), cancellationToken));
+    private static async Task<IResult> GetMe(ClaimsPrincipal user, IAuthService authService, CancellationToken cancellationToken)
+        => Results.Ok(await authService.GetCurrentUser(user.GetUserId(), cancellationToken));
 }

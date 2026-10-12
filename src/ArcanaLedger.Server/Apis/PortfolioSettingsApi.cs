@@ -22,9 +22,9 @@ public static class PortfolioSettingsApi
             .ProducesValidationProblem();
     }
 
-    private static IResult Get(Guid portfolioId, ClaimsPrincipal user, IPortfolioSettingsService service, CancellationToken cancellationToken)
-        => Results.Ok(service.Get(user.GetUserId(), portfolioId, cancellationToken));
+    private static async Task<IResult> Get(Guid portfolioId, ClaimsPrincipal user, IPortfolioSettingsService service, CancellationToken cancellationToken)
+        => Results.Ok(await service.Get(user.GetUserId(), portfolioId, cancellationToken));
 
-    private static IResult Upsert(Guid portfolioId, UpsertPortfolioSettingsRequest request, ClaimsPrincipal user, IPortfolioSettingsService service, CancellationToken cancellationToken)
-        => Results.Ok(service.Upsert(user.GetUserId(), portfolioId, request, cancellationToken));
+    private static async Task<IResult> Upsert(Guid portfolioId, UpsertPortfolioSettingsRequest request, ClaimsPrincipal user, IPortfolioSettingsService service, CancellationToken cancellationToken)
+        => Results.Ok(await service.Upsert(user.GetUserId(), portfolioId, request, cancellationToken));
 }

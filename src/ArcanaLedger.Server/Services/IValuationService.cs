@@ -8,15 +8,15 @@ namespace ArcanaLedger.Server.Services;
 /// </summary>
 public interface IValuationService
 {
-    IReadOnlyList<ValuationModelResponse> List(Guid userId, Guid? instrumentId, CancellationToken cancellationToken);
+    Task<IReadOnlyList<ValuationModelResponse>> List(Guid userId, Guid? instrumentId, CancellationToken cancellationToken);
 
-    ValuationModelResponse Create(Guid userId, CreateValuationModelRequest request, CancellationToken cancellationToken);
+    Task<ValuationModelResponse> Create(Guid userId, CreateValuationModelRequest request, CancellationToken cancellationToken);
 
-    ValuationModelResponse Get(Guid userId, Guid valuationId, CancellationToken cancellationToken);
+    Task<ValuationModelResponse> Get(Guid userId, Guid valuationId, CancellationToken cancellationToken);
 
-    ValuationModelResponse Update(Guid userId, Guid valuationId, UpdateValuationModelRequest request, CancellationToken cancellationToken);
+    Task<ValuationModelResponse> Update(Guid userId, Guid valuationId, UpdateValuationModelRequest request, CancellationToken cancellationToken);
 
-    void Delete(Guid userId, Guid valuationId, CancellationToken cancellationToken);
+    Task Delete(Guid userId, Guid valuationId, CancellationToken cancellationToken);
 
-    IReadOnlyList<ValuationForecastResponse> ListForecasts(Guid userId, Guid valuationId, CancellationToken cancellationToken);
+    Task<IReadOnlyList<ValuationForecastResponse>> ListForecasts(Guid userId, Guid valuationId, CancellationToken cancellationToken);
 }

@@ -16,6 +16,6 @@ public static class DashboardApi
             .Produces<DashboardSummaryResponse>();
     }
 
-    private static IResult Get(Guid portfolioId, ClaimsPrincipal user, IDashboardService service, CancellationToken cancellationToken)
-        => Results.Ok(service.GetSummary(user.GetUserId(), portfolioId, cancellationToken));
+    private static async Task<IResult> Get(Guid portfolioId, ClaimsPrincipal user, IDashboardService service, CancellationToken cancellationToken)
+        => Results.Ok(await service.GetSummary(user.GetUserId(), portfolioId, cancellationToken));
 }

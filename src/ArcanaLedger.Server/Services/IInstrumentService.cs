@@ -8,7 +8,7 @@ namespace ArcanaLedger.Server.Services;
 /// </summary>
 public interface IInstrumentService
 {
-    IReadOnlyList<InstrumentResponse> Search(string? search, CancellationToken cancellationToken);
+    Task<IReadOnlyList<InstrumentResponse>> Search(string? search, CancellationToken cancellationToken);
 
-    InstrumentResponse Get(Guid instrumentId, CancellationToken cancellationToken);
+    Task<InstrumentResponse> Get(Guid instrumentId, CancellationToken cancellationToken);
 }

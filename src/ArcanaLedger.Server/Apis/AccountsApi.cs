@@ -32,21 +32,21 @@ public static class AccountsApi
             .Produces(StatusCodes.Status204NoContent);
     }
 
-    private static IResult List(Guid portfolioId, ClaimsPrincipal user, IBrokerageAccountService service, CancellationToken cancellationToken)
-        => Results.Ok(service.List(user.GetUserId(), portfolioId, cancellationToken));
+    private static async Task<IResult> List(Guid portfolioId, ClaimsPrincipal user, IBrokerageAccountService service, CancellationToken cancellationToken)
+        => Results.Ok(await service.List(user.GetUserId(), portfolioId, cancellationToken));
 
-    private static IResult Create(Guid portfolioId, CreateAccountRequest request, ClaimsPrincipal user, IBrokerageAccountService service, CancellationToken cancellationToken)
+    private static async Task<IResult> Create(Guid portfolioId, CreateAccountRequest request, ClaimsPrincipal user, IBrokerageAccountService service, CancellationToken cancellationToken)
     {
-        var account = service.Create(user.GetUserId(), portfolioId, request, cancellationToken);
+        var account = await service.Create(user.GetUserId(), portfolioId, request, cancellationToken);
         return Results.Created($"/api/v1/portfolios/{portfolioId}/accounts/{account.Id}", account);
     }
 
-    private static IResult Update(Guid portfolioId, Guid accountId, UpdateAccountRequest request, ClaimsPrincipal user, IBrokerageAccountService service, CancellationToken cancellationToken)
-        => Results.Ok(service.Update(user.GetUserId(), portfolioId, accountId, request, cancellationToken));
+    private static async Task<IResult> Update(Guid portfolioId, Guid accountId, UpdateAccountRequest request, ClaimsPrincipal user, IBrokerageAccountService service, CancellationToken cancellationToken)
+        => Results.Ok(await service.Update(user.GetUserId(), portfolioId, accountId, request, cancellationToken));
 
-    private static IResult Delete(Guid portfolioId, Guid accountId, ClaimsPrincipal user, IBrokerageAccountService service, CancellationToken cancellationToken)
+    private static async Task<IResult> Delete(Guid portfolioId, Guid accountId, ClaimsPrincipal user, IBrokerageAccountService service, CancellationToken cancellationToken)
     {
-        service.Delete(user.GetUserId(), portfolioId, accountId, cancellationToken);
+        await service.Delete(user.GetUserId(), portfolioId, accountId, cancellationToken);
         return Results.NoContent();
     }
 }

@@ -11,17 +11,17 @@ public sealed record TradeListFilter(Guid? PortfolioId, string? Status, string? 
 /// </summary>
 public interface ITradeService
 {
-    IReadOnlyList<TradeListItemResponse> List(Guid userId, TradeListFilter filter, CancellationToken cancellationToken);
+    Task<IReadOnlyList<TradeListItemResponse>> List(Guid userId, TradeListFilter filter, CancellationToken cancellationToken);
 
-    TradeResponse Create(Guid userId, CreateTradeRequest request, CancellationToken cancellationToken);
+    Task<TradeResponse> Create(Guid userId, CreateTradeRequest request, CancellationToken cancellationToken);
 
-    TradeResponse Get(Guid userId, Guid tradeId, CancellationToken cancellationToken);
+    Task<TradeResponse> Get(Guid userId, Guid tradeId, CancellationToken cancellationToken);
 
-    TradeResponse Update(Guid userId, Guid tradeId, UpdateTradeRequest request, CancellationToken cancellationToken);
+    Task<TradeResponse> Update(Guid userId, Guid tradeId, UpdateTradeRequest request, CancellationToken cancellationToken);
 
-    void Delete(Guid userId, Guid tradeId, CancellationToken cancellationToken);
+    Task Delete(Guid userId, Guid tradeId, CancellationToken cancellationToken);
 
-    IReadOnlyList<TradeExecutionResponse> ListExecutions(Guid userId, Guid tradeId, CancellationToken cancellationToken);
+    Task<IReadOnlyList<TradeExecutionResponse>> ListExecutions(Guid userId, Guid tradeId, CancellationToken cancellationToken);
 
-    TradeExecutionResponse AddExecution(Guid userId, Guid tradeId, CreateTradeExecutionRequest request, CancellationToken cancellationToken);
+    Task<TradeExecutionResponse> AddExecution(Guid userId, Guid tradeId, CreateTradeExecutionRequest request, CancellationToken cancellationToken);
 }

@@ -21,7 +21,7 @@ public static class TransactionsApi
             .ProducesValidationProblem();
     }
 
-    private static IResult List(
+    private static async Task<IResult> List(
         Guid portfolioId,
         string? type,
         DateTimeOffset? from,
@@ -29,11 +29,11 @@ public static class TransactionsApi
         ClaimsPrincipal user,
         IPortfolioTransactionService service,
         CancellationToken cancellationToken)
-        => Results.Ok(service.List(user.GetUserId(), portfolioId, new TransactionListFilter(type, from, to), cancellationToken));
+        => Results.Ok(await service.List(user.GetUserId(), portfolioId, new TransactionListFilter(type, from, to), cancellationToken));
 
-    private static IResult Create(Guid portfolioId, CreatePortfolioTransactionRequest request, ClaimsPrincipal user, IPortfolioTransactionService service, CancellationToken cancellationToken)
+    private static async Task<IResult> Create(Guid portfolioId, CreatePortfolioTransactionRequest request, ClaimsPrincipal user, IPortfolioTransactionService service, CancellationToken cancellationToken)
     {
-        var transaction = service.Create(user.GetUserId(), portfolioId, request, cancellationToken);
+        var transaction = await service.Create(user.GetUserId(), portfolioId, request, cancellationToken);
         return Results.Created($"/api/v1/portfolios/{portfolioId}/transactions/{transaction.Id}", transaction);
     }
 }

@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS trade_setups (
     user_id uuid NOT NULL REFERENCES app_users(user_id) ON DELETE CASCADE,
     code text NOT NULL CHECK (length(trim(code)) BETWEEN 1 AND 80),
     name text NOT NULL CHECK (length(trim(name)) BETWEEN 1 AND 120),
-    family text NOT NULL CHECK (family IN ('position', 'swing', 'momentum', 'counter_trend', 'other')),
+    family text NOT NULL CHECK (family IN ('position', 'swing', 'momentum', 'counter_trend', 'other', 'day')),
     entry_rule text,
     exit_rule text,
     trend text CHECK (trend IN ('up', 'down', 'neutral')),
@@ -160,7 +160,7 @@ CREATE INDEX IF NOT EXISTS ix_trade_executions_trade_time
 CREATE TABLE IF NOT EXISTS portfolio_transactions (
     transaction_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     portfolio_id uuid NOT NULL REFERENCES portfolios(portfolio_id) ON DELETE CASCADE,
-    account_id uuid NOT NULL,
+    account_id uuid,
     instrument_id uuid REFERENCES instruments(instrument_id),
     trade_id uuid REFERENCES trades(trade_id) ON DELETE SET NULL,
     transaction_type text NOT NULL CHECK (transaction_type IN (
@@ -174,7 +174,8 @@ CREATE TABLE IF NOT EXISTS portfolio_transactions (
     memo text,
     external_id text,
     FOREIGN KEY (account_id, portfolio_id)
-        REFERENCES brokerage_accounts(account_id, portfolio_id),
+        REFERENCES brokerage_accounts(account_id, portfolio_id)
+        ON DELETE SET NULL (account_id),
     UNIQUE (account_id, external_id)
 );
 
@@ -218,8 +219,8 @@ CREATE TABLE IF NOT EXISTS valuation_models (
     name text NOT NULL CHECK (length(trim(name)) BETWEEN 1 AND 120),
     estimated_revenue numeric(20, 8) NOT NULL CHECK (estimated_revenue >= 0),
     estimated_net_income numeric(20, 8) NOT NULL,
-    actual_prior_year_revenue numeric(20, 8) NOT NULL CHECK (actual_prior_year_revenue >= 0),
-    actual_prior_year_net_income numeric(20, 8) NOT NULL,
+    actual_prior_year_revenue numeric(20, 8) CHECK (actual_prior_year_revenue IS NULL OR actual_prior_year_revenue >= 0),
+    actual_prior_year_net_income numeric(20, 8),
     shares_outstanding numeric(20, 8) NOT NULL CHECK (shares_outstanding > 0),
     revenue_growth_rate numeric(12, 8) NOT NULL,
     terminal_margin numeric(12, 8) NOT NULL,

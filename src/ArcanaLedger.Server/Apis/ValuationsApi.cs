@@ -43,27 +43,27 @@ public static class ValuationsApi
             .Produces<IReadOnlyList<ValuationForecastResponse>>();
     }
 
-    private static IResult List(Guid? instrumentId, ClaimsPrincipal user, IValuationService service, CancellationToken cancellationToken)
-        => Results.Ok(service.List(user.GetUserId(), instrumentId, cancellationToken));
+    private static async Task<IResult> List(Guid? instrumentId, ClaimsPrincipal user, IValuationService service, CancellationToken cancellationToken)
+        => Results.Ok(await service.List(user.GetUserId(), instrumentId, cancellationToken));
 
-    private static IResult Create(CreateValuationModelRequest request, ClaimsPrincipal user, IValuationService service, CancellationToken cancellationToken)
+    private static async Task<IResult> Create(CreateValuationModelRequest request, ClaimsPrincipal user, IValuationService service, CancellationToken cancellationToken)
     {
-        var valuation = service.Create(user.GetUserId(), request, cancellationToken);
+        var valuation = await service.Create(user.GetUserId(), request, cancellationToken);
         return Results.Created($"/api/v1/valuations/{valuation.Id}", valuation);
     }
 
-    private static IResult Get(Guid valuationId, ClaimsPrincipal user, IValuationService service, CancellationToken cancellationToken)
-        => Results.Ok(service.Get(user.GetUserId(), valuationId, cancellationToken));
+    private static async Task<IResult> Get(Guid valuationId, ClaimsPrincipal user, IValuationService service, CancellationToken cancellationToken)
+        => Results.Ok(await service.Get(user.GetUserId(), valuationId, cancellationToken));
 
-    private static IResult Update(Guid valuationId, UpdateValuationModelRequest request, ClaimsPrincipal user, IValuationService service, CancellationToken cancellationToken)
-        => Results.Ok(service.Update(user.GetUserId(), valuationId, request, cancellationToken));
+    private static async Task<IResult> Update(Guid valuationId, UpdateValuationModelRequest request, ClaimsPrincipal user, IValuationService service, CancellationToken cancellationToken)
+        => Results.Ok(await service.Update(user.GetUserId(), valuationId, request, cancellationToken));
 
-    private static IResult Delete(Guid valuationId, ClaimsPrincipal user, IValuationService service, CancellationToken cancellationToken)
+    private static async Task<IResult> Delete(Guid valuationId, ClaimsPrincipal user, IValuationService service, CancellationToken cancellationToken)
     {
-        service.Delete(user.GetUserId(), valuationId, cancellationToken);
+        await service.Delete(user.GetUserId(), valuationId, cancellationToken);
         return Results.NoContent();
     }
 
-    private static IResult ListForecasts(Guid valuationId, ClaimsPrincipal user, IValuationService service, CancellationToken cancellationToken)
-        => Results.Ok(service.ListForecasts(user.GetUserId(), valuationId, cancellationToken));
+    private static async Task<IResult> ListForecasts(Guid valuationId, ClaimsPrincipal user, IValuationService service, CancellationToken cancellationToken)
+        => Results.Ok(await service.ListForecasts(user.GetUserId(), valuationId, cancellationToken));
 }

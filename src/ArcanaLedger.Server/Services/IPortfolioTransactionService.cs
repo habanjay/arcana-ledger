@@ -11,7 +11,7 @@ public sealed record TransactionListFilter(string? TransactionType, DateTimeOffs
 /// </summary>
 public interface IPortfolioTransactionService
 {
-    IReadOnlyList<PortfolioTransactionResponse> List(Guid userId, Guid portfolioId, TransactionListFilter filter, CancellationToken cancellationToken);
+    Task<IReadOnlyList<PortfolioTransactionResponse>> List(Guid userId, Guid portfolioId, TransactionListFilter filter, CancellationToken cancellationToken);
 
-    PortfolioTransactionResponse Create(Guid userId, Guid portfolioId, CreatePortfolioTransactionRequest request, CancellationToken cancellationToken);
+    Task<PortfolioTransactionResponse> Create(Guid userId, Guid portfolioId, CreatePortfolioTransactionRequest request, CancellationToken cancellationToken);
 }

@@ -47,24 +47,24 @@ public static class PortfoliosApi
         PortfolioSettingsApi.Map(portfolioScoped.MapGroup("/settings").WithTags("Portfolio settings"));
     }
 
-    private static IResult List(ClaimsPrincipal user, IPortfolioService service, CancellationToken cancellationToken)
-        => Results.Ok(service.List(user.GetUserId(), cancellationToken));
+    private static async Task<IResult> List(ClaimsPrincipal user, IPortfolioService service, CancellationToken cancellationToken)
+        => Results.Ok(await service.List(user.GetUserId(), cancellationToken));
 
-    private static IResult Create(CreatePortfolioRequest request, ClaimsPrincipal user, IPortfolioService service, CancellationToken cancellationToken)
+    private static async Task<IResult> Create(CreatePortfolioRequest request, ClaimsPrincipal user, IPortfolioService service, CancellationToken cancellationToken)
     {
-        var portfolio = service.Create(user.GetUserId(), request, cancellationToken);
+        var portfolio = await service.Create(user.GetUserId(), request, cancellationToken);
         return Results.Created($"/api/v1/portfolios/{portfolio.Id}", portfolio);
     }
 
-    private static IResult Get(Guid portfolioId, ClaimsPrincipal user, IPortfolioService service, CancellationToken cancellationToken)
-        => Results.Ok(service.Get(user.GetUserId(), portfolioId, cancellationToken));
+    private static async Task<IResult> Get(Guid portfolioId, ClaimsPrincipal user, IPortfolioService service, CancellationToken cancellationToken)
+        => Results.Ok(await service.Get(user.GetUserId(), portfolioId, cancellationToken));
 
-    private static IResult Update(Guid portfolioId, UpdatePortfolioRequest request, ClaimsPrincipal user, IPortfolioService service, CancellationToken cancellationToken)
-        => Results.Ok(service.Update(user.GetUserId(), portfolioId, request, cancellationToken));
+    private static async Task<IResult> Update(Guid portfolioId, UpdatePortfolioRequest request, ClaimsPrincipal user, IPortfolioService service, CancellationToken cancellationToken)
+        => Results.Ok(await service.Update(user.GetUserId(), portfolioId, request, cancellationToken));
 
-    private static IResult Delete(Guid portfolioId, ClaimsPrincipal user, IPortfolioService service, CancellationToken cancellationToken)
+    private static async Task<IResult> Delete(Guid portfolioId, ClaimsPrincipal user, IPortfolioService service, CancellationToken cancellationToken)
     {
-        service.Delete(user.GetUserId(), portfolioId, cancellationToken);
+        await service.Delete(user.GetUserId(), portfolioId, cancellationToken);
         return Results.NoContent();
     }
 }

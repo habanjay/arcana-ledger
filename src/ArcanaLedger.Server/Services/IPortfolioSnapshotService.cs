@@ -8,5 +8,5 @@ namespace ArcanaLedger.Server.Services;
 /// </summary>
 public interface IPortfolioSnapshotService
 {
-    IReadOnlyList<PortfolioSnapshotResponse> List(Guid userId, Guid portfolioId, DateOnly? from, DateOnly? to, CancellationToken cancellationToken);
+    Task<IReadOnlyList<PortfolioSnapshotResponse>> List(Guid userId, Guid portfolioId, DateOnly? from, DateOnly? to, CancellationToken cancellationToken);
 }

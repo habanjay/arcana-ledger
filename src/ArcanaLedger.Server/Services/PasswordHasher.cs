@@ -3,9 +3,8 @@ using System.Security.Cryptography;
 namespace ArcanaLedger.Server.Services;
 
 /// <summary>
-/// Salted PBKDF2 password hashing used by the mock user store. Not a substitute for a
-/// production-grade identity provider, but avoids storing plaintext credentials even in
-/// the local/demo mock data.
+/// Salted PBKDF2 password hashing for locally managed database accounts. Not a substitute
+/// for a production-grade identity provider, but avoids storing plaintext credentials.
 /// </summary>
 public static class PasswordHasher
 {

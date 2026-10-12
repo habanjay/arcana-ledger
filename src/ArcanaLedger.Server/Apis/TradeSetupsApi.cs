@@ -38,24 +38,24 @@ public static class TradeSetupsApi
             .Produces(StatusCodes.Status204NoContent);
     }
 
-    private static IResult List(ClaimsPrincipal user, ITradeSetupService service, CancellationToken cancellationToken)
-        => Results.Ok(service.List(user.GetUserId(), cancellationToken));
+    private static async Task<IResult> List(ClaimsPrincipal user, ITradeSetupService service, CancellationToken cancellationToken)
+        => Results.Ok(await service.List(user.GetUserId(), cancellationToken));
 
-    private static IResult Create(CreateTradeSetupRequest request, ClaimsPrincipal user, ITradeSetupService service, CancellationToken cancellationToken)
+    private static async Task<IResult> Create(CreateTradeSetupRequest request, ClaimsPrincipal user, ITradeSetupService service, CancellationToken cancellationToken)
     {
-        var setup = service.Create(user.GetUserId(), request, cancellationToken);
+        var setup = await service.Create(user.GetUserId(), request, cancellationToken);
         return Results.Created($"/api/v1/trade-setups/{setup.Id}", setup);
     }
 
-    private static IResult Get(Guid setupId, ClaimsPrincipal user, ITradeSetupService service, CancellationToken cancellationToken)
-        => Results.Ok(service.Get(user.GetUserId(), setupId, cancellationToken));
+    private static async Task<IResult> Get(Guid setupId, ClaimsPrincipal user, ITradeSetupService service, CancellationToken cancellationToken)
+        => Results.Ok(await service.Get(user.GetUserId(), setupId, cancellationToken));
 
-    private static IResult Update(Guid setupId, UpdateTradeSetupRequest request, ClaimsPrincipal user, ITradeSetupService service, CancellationToken cancellationToken)
-        => Results.Ok(service.Update(user.GetUserId(), setupId, request, cancellationToken));
+    private static async Task<IResult> Update(Guid setupId, UpdateTradeSetupRequest request, ClaimsPrincipal user, ITradeSetupService service, CancellationToken cancellationToken)
+        => Results.Ok(await service.Update(user.GetUserId(), setupId, request, cancellationToken));
 
-    private static IResult Delete(Guid setupId, ClaimsPrincipal user, ITradeSetupService service, CancellationToken cancellationToken)
+    private static async Task<IResult> Delete(Guid setupId, ClaimsPrincipal user, ITradeSetupService service, CancellationToken cancellationToken)
     {
-        service.Delete(user.GetUserId(), setupId, cancellationToken);
+        await service.Delete(user.GetUserId(), setupId, cancellationToken);
         return Results.NoContent();
     }
 }

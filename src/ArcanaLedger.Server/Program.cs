@@ -1,8 +1,8 @@
 using ArcanaLedger.Server.Apis;
+using ArcanaLedger.Server.Database;
 using ArcanaLedger.Server.Dtos.Common;
 using ArcanaLedger.Server.Dtos.Json;
 using ArcanaLedger.Server.Middleware;
-using ArcanaLedger.Server.Mocks;
 using ArcanaLedger.Server.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
@@ -15,13 +15,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 if (args.Contains("--apply-database-script", StringComparer.Ordinal))
 {
-    var connectionString = builder.Configuration.GetConnectionString("ArcanaLedger")
+    var scriptConnectionString = builder.Configuration.GetConnectionString("ArcanaLedger")
         ?? throw new InvalidOperationException(
             "Set ConnectionStrings:ArcanaLedger before applying the database script.");
     var scriptPath = Path.Combine(AppContext.BaseDirectory, "Database", "schema.sql");
     var script = await File.ReadAllTextAsync(scriptPath);
 
-    await using var connection = new NpgsqlConnection(connectionString);
+    await using var connection = new NpgsqlConnection(scriptConnectionString);
     await connection.OpenAsync();
     await using var command = new NpgsqlCommand(script, connection);
     await command.ExecuteNonQueryAsync();
@@ -43,8 +43,7 @@ builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.Converters.Add(new NullableUtcDateTimeOffsetJsonConverter());
 });
 
-// JWT bearer authentication: tokens are issued by JwtTokenService (Services/) from
-// credentials verified against the mock user store (Mocks/).
+// JWT bearer authentication uses credentials verified against PostgreSQL app_users.
 builder.Services.AddOptions<JwtOptions>()
     .Bind(builder.Configuration.GetSection(JwtOptions.SectionName))
     .ValidateDataAnnotations()
@@ -82,24 +81,25 @@ builder.Services.AddRateLimiter(options =>
     });
 });
 
-// Mock data layer (Mocks/): a single shared in-memory store backs every resource service so
-// state is consistent across requests. Local/demo use only.
+var connectionString = builder.Configuration.GetConnectionString("ArcanaLedger")
+    ?? throw new InvalidOperationException(
+        "Configure ConnectionStrings:ArcanaLedger before starting Arcana Ledger Server.");
+builder.Services.AddSingleton(NpgsqlDataSource.Create(connectionString));
 builder.Services.AddSingleton(TimeProvider.System);
-builder.Services.AddSingleton<MockDataStore>();
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
-builder.Services.AddSingleton<IAuthService, MockAuthService>();
-builder.Services.AddSingleton<IPortfolioService, MockPortfolioService>();
-builder.Services.AddSingleton<IBrokerageAccountService, MockBrokerageAccountService>();
-builder.Services.AddSingleton<IInstrumentService, MockInstrumentService>();
-builder.Services.AddSingleton<IWatchlistService, MockWatchlistService>();
-builder.Services.AddSingleton<ITradeSetupService, MockTradeSetupService>();
-builder.Services.AddSingleton<ITradeService, MockTradeService>();
-builder.Services.AddSingleton<IPortfolioTransactionService, MockPortfolioTransactionService>();
-builder.Services.AddSingleton<IPortfolioSnapshotService, MockPortfolioSnapshotService>();
-builder.Services.AddSingleton<IPortfolioActivityService, MockPortfolioActivityService>();
-builder.Services.AddSingleton<IDashboardService, MockDashboardService>();
-builder.Services.AddSingleton<IValuationService, MockValuationService>();
-builder.Services.AddSingleton<IPortfolioSettingsService, MockPortfolioSettingsService>();
+builder.Services.AddSingleton<IAuthService, PostgresAuthService>();
+builder.Services.AddSingleton<IPortfolioService, PostgresPortfolioService>();
+builder.Services.AddSingleton<IBrokerageAccountService, PostgresBrokerageAccountService>();
+builder.Services.AddSingleton<IInstrumentService, PostgresInstrumentService>();
+builder.Services.AddSingleton<IWatchlistService, PostgresWatchlistService>();
+builder.Services.AddSingleton<ITradeSetupService, PostgresTradeSetupService>();
+builder.Services.AddSingleton<ITradeService, PostgresTradeService>();
+builder.Services.AddSingleton<IPortfolioTransactionService, PostgresPortfolioTransactionService>();
+builder.Services.AddSingleton<IPortfolioSnapshotService, PostgresPortfolioSnapshotService>();
+builder.Services.AddSingleton<IPortfolioActivityService, PostgresPortfolioActivityService>();
+builder.Services.AddSingleton<IDashboardService, PostgresDashboardService>();
+builder.Services.AddSingleton<IValuationService, PostgresValuationService>();
+builder.Services.AddSingleton<IPortfolioSettingsService, PostgresPortfolioSettingsService>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi(options =>

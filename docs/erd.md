@@ -1,21 +1,21 @@
 
 # Arcana Ledger database schema
 
-This document is the proposed relational model for the trading dashboard. It is a target design, not the database schema currently deployed by `ArcanaLedger.Server`.
+This document describes the PostgreSQL schema used by the trading dashboard and the corresponding ERD.
 
 ## Implementation status
 
-The server includes an executable PostgreSQL schema script at [schema.sql](../src/ArcanaLedger.Server/Database/schema.sql), applied on demand through Npgsql (ADO.NET). The API continues to use its existing mock services; applying the schema does not switch API persistence or modify the database during ordinary startup.
+The server uses Npgsql (ADO.NET) for persistent access to all business resources. The executable PostgreSQL schema script is at [schema.sql](../src/ArcanaLedger.Server/Database/schema.sql). Aspire provisions PostgreSQL with a persistent volume and applies this script when initializing a new database volume. For an existing Aspire volume or external PostgreSQL database, apply the script explicitly as described below. The server requires `ConnectionStrings:ArcanaLedger`.
 
-The DDL targets PostgreSQL 16+ and is intentionally independent of the current mock frontend data. Amounts are stored as `numeric`, never floating point, and timestamps are stored in UTC with `timestamptz`. The executable script creates the ERD tables and indexes in a transaction, and defines `set_default_portfolio` for changing a user's default portfolio.
+The DDL targets PostgreSQL 16+. Amounts are stored as `numeric`, never floating point, and timestamps are stored in UTC with `timestamptz`. The executable script creates the ERD tables and indexes in a transaction, and defines `set_default_portfolio` for changing a user's default portfolio. Instruments and quotes are read from the database and must be populated by a market-data import process.
 
-To apply the script, create the target database, set `ConnectionStrings:ArcanaLedger` (or the `ConnectionStrings__ArcanaLedger` environment variable), then run from the repository root:
+To apply the script manually, create the target database, set `ConnectionStrings:ArcanaLedger` (or the `ConnectionStrings__ArcanaLedger` environment variable), then run from the repository root:
 
 ```powershell
 dotnet run --project src\ArcanaLedger.Server\ArcanaLedger.Server.csproj -- --apply-database-script
 ```
 
-This explicit command requires a database role able to create the `citext` and `pgcrypto` extensions. The script uses `IF NOT EXISTS` for tables and indexes, so it can be rerun on a database already created from this schema; it is not a replacement for versioned migrations when the schema evolves.
+This explicit command requires a database role able to create the `citext` and `pgcrypto` extensions. The script uses `IF NOT EXISTS` for tables and indexes, so it can be rerun on a database already created from this schema; it is not a replacement for versioned migrations when the schema evolves. Aspire provides the connection string automatically; external runs must set `ConnectionStrings__ArcanaLedger` for server startup.
 
 ## Entity relationship diagram
 
@@ -225,7 +225,7 @@ erDiagram
 | `valuation_forecasts` | One row per forecast year produced by a valuation model. |
 | `portfolio_settings` | Portfolio risk, reserve, and per-setup position-sizing defaults shown on the Configuration page, with allocation percentages as generated columns. |
 
-## Planned PostgreSQL DDL
+## PostgreSQL DDL reference
 
 Run this as an initial migration. Application migrations should add columns or tables in later revisions rather than editing an already-applied migration.
 
@@ -320,7 +320,7 @@ CREATE TABLE trade_setups (
 	user_id uuid NOT NULL REFERENCES app_users(user_id) ON DELETE CASCADE,
 	code text NOT NULL CHECK (length(trim(code)) BETWEEN 1 AND 80),
 	name text NOT NULL CHECK (length(trim(name)) BETWEEN 1 AND 120),
-	family text NOT NULL CHECK (family IN ('position', 'swing', 'momentum', 'counter_trend', 'other')),
+	family text NOT NULL CHECK (family IN ('position', 'swing', 'momentum', 'counter_trend', 'other', 'day')),
 	entry_rule text,
 	exit_rule text,
 	trend text CHECK (trend IN ('up', 'down', 'neutral')),
@@ -390,7 +390,7 @@ CREATE INDEX ix_trade_executions_trade_time
 CREATE TABLE portfolio_transactions (
 	transaction_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 	portfolio_id uuid NOT NULL REFERENCES portfolios(portfolio_id) ON DELETE CASCADE,
-	account_id uuid NOT NULL,
+	account_id uuid,
 	instrument_id uuid REFERENCES instruments(instrument_id),
 	trade_id uuid REFERENCES trades(trade_id) ON DELETE SET NULL,
 	transaction_type text NOT NULL CHECK (transaction_type IN (
@@ -404,7 +404,8 @@ CREATE TABLE portfolio_transactions (
 	memo text,
 	external_id text,
 	FOREIGN KEY (account_id, portfolio_id)
-		REFERENCES brokerage_accounts(account_id, portfolio_id),
+		REFERENCES brokerage_accounts(account_id, portfolio_id)
+		ON DELETE SET NULL (account_id),
 	UNIQUE (account_id, external_id)
 );
 
@@ -448,8 +449,8 @@ CREATE TABLE valuation_models (
 	name text NOT NULL CHECK (length(trim(name)) BETWEEN 1 AND 120),
 	estimated_revenue numeric(20, 8) NOT NULL CHECK (estimated_revenue >= 0),
 	estimated_net_income numeric(20, 8) NOT NULL,
-	actual_prior_year_revenue numeric(20, 8) NOT NULL CHECK (actual_prior_year_revenue >= 0),
-	actual_prior_year_net_income numeric(20, 8) NOT NULL,
+	actual_prior_year_revenue numeric(20, 8) CHECK (actual_prior_year_revenue IS NULL OR actual_prior_year_revenue >= 0),
+	actual_prior_year_net_income numeric(20, 8),
 	shares_outstanding numeric(20, 8) NOT NULL CHECK (shares_outstanding > 0),
 	revenue_growth_rate numeric(12, 8) NOT NULL,
 	terminal_margin numeric(12, 8) NOT NULL,

@@ -20,9 +20,9 @@ public static class InstrumentsApi
             .Produces(StatusCodes.Status404NotFound);
     }
 
-    private static IResult Search(string? search, IInstrumentService service, CancellationToken cancellationToken)
-        => Results.Ok(service.Search(search, cancellationToken));
+    private static async Task<IResult> Search(string? search, IInstrumentService service, CancellationToken cancellationToken)
+        => Results.Ok(await service.Search(search, cancellationToken));
 
-    private static IResult Get(Guid instrumentId, IInstrumentService service, CancellationToken cancellationToken)
-        => Results.Ok(service.Get(instrumentId, cancellationToken));
+    private static async Task<IResult> Get(Guid instrumentId, IInstrumentService service, CancellationToken cancellationToken)
+        => Results.Ok(await service.Get(instrumentId, cancellationToken));
 }

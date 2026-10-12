@@ -33,21 +33,21 @@ public static class WatchlistApi
             .Produces(StatusCodes.Status204NoContent);
     }
 
-    private static IResult List(Guid portfolioId, ClaimsPrincipal user, IWatchlistService service, CancellationToken cancellationToken)
-        => Results.Ok(service.List(user.GetUserId(), portfolioId, cancellationToken));
+    private static async Task<IResult> List(Guid portfolioId, ClaimsPrincipal user, IWatchlistService service, CancellationToken cancellationToken)
+        => Results.Ok(await service.List(user.GetUserId(), portfolioId, cancellationToken));
 
-    private static IResult Add(Guid portfolioId, AddWatchlistItemRequest request, ClaimsPrincipal user, IWatchlistService service, CancellationToken cancellationToken)
+    private static async Task<IResult> Add(Guid portfolioId, AddWatchlistItemRequest request, ClaimsPrincipal user, IWatchlistService service, CancellationToken cancellationToken)
     {
-        var item = service.Add(user.GetUserId(), portfolioId, request, cancellationToken);
+        var item = await service.Add(user.GetUserId(), portfolioId, request, cancellationToken);
         return Results.Created($"/api/v1/portfolios/{portfolioId}/watchlist/{request.InstrumentId}", item);
     }
 
-    private static IResult Reorder(Guid portfolioId, Guid instrumentId, UpdateWatchlistItemRequest request, ClaimsPrincipal user, IWatchlistService service, CancellationToken cancellationToken)
-        => Results.Ok(service.Reorder(user.GetUserId(), portfolioId, instrumentId, request, cancellationToken));
+    private static async Task<IResult> Reorder(Guid portfolioId, Guid instrumentId, UpdateWatchlistItemRequest request, ClaimsPrincipal user, IWatchlistService service, CancellationToken cancellationToken)
+        => Results.Ok(await service.Reorder(user.GetUserId(), portfolioId, instrumentId, request, cancellationToken));
 
-    private static IResult Remove(Guid portfolioId, Guid instrumentId, ClaimsPrincipal user, IWatchlistService service, CancellationToken cancellationToken)
+    private static async Task<IResult> Remove(Guid portfolioId, Guid instrumentId, ClaimsPrincipal user, IWatchlistService service, CancellationToken cancellationToken)
     {
-        service.Remove(user.GetUserId(), portfolioId, instrumentId, cancellationToken);
+        await service.Remove(user.GetUserId(), portfolioId, instrumentId, cancellationToken);
         return Results.NoContent();
     }
 }

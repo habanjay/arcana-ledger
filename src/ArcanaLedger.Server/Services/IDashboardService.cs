@@ -8,5 +8,5 @@ namespace ArcanaLedger.Server.Services;
 /// </summary>
 public interface IDashboardService
 {
-    DashboardSummaryResponse GetSummary(Guid userId, Guid portfolioId, CancellationToken cancellationToken);
+    Task<DashboardSummaryResponse> GetSummary(Guid userId, Guid portfolioId, CancellationToken cancellationToken);
 }

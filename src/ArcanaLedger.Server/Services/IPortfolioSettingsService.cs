@@ -8,7 +8,7 @@ namespace ArcanaLedger.Server.Services;
 /// </summary>
 public interface IPortfolioSettingsService
 {
-    PortfolioSettingsResponse Get(Guid userId, Guid portfolioId, CancellationToken cancellationToken);
+    Task<PortfolioSettingsResponse> Get(Guid userId, Guid portfolioId, CancellationToken cancellationToken);
 
-    PortfolioSettingsResponse Upsert(Guid userId, Guid portfolioId, UpsertPortfolioSettingsRequest request, CancellationToken cancellationToken);
+    Task<PortfolioSettingsResponse> Upsert(Guid userId, Guid portfolioId, UpsertPortfolioSettingsRequest request, CancellationToken cancellationToken);
 }

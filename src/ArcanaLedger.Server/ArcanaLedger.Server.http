@@ -6,22 +6,9 @@ Accept: application/json
 
 ###
 
-# Seeded demo credentials (local/demo use only, see Mocks/MockDataStore.cs).
-# Login first, then the subsequent requests reuse the captured access token.
+# Register before login. Instrument requests require instruments imported into PostgreSQL.
 
-# @name login
-POST {{Api}}/auth/login
-Content-Type: application/json
-
-{
-  "email": "trader@example.com",
-  "password": "Str0ngPassword!"
-}
-
-###
-
-@authToken = {{login.response.body.$.accessToken}}
-
+# @name register
 POST {{Api}}/auth/register
 Content-Type: application/json
 
@@ -32,6 +19,19 @@ Content-Type: application/json
 }
 
 ###
+
+# @name login
+POST {{Api}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "new-trader@example.com",
+  "password": "AnotherStr0ngPassword!"
+}
+
+###
+
+@authToken = {{login.response.body.$.accessToken}}
 
 GET {{Api}}/auth/me
 Authorization: Bearer {{authToken}}
@@ -48,13 +48,14 @@ Authorization: Bearer {{authToken}}
 
 ###
 
-@portfolioId = 1e3a3b3e-2f2f-4a9a-8a9a-1a2b3c4d5e6f
+@portfolioId = {{createPortfolio.response.body.$.id}}
 
 GET {{Api}}/portfolios/{{portfolioId}}
 Authorization: Bearer {{authToken}}
 
 ###
 
+# @name createPortfolio
 POST {{Api}}/portfolios
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
@@ -82,6 +83,7 @@ Authorization: Bearer {{authToken}}
 
 ###
 
+# @name createAccount
 POST {{Api}}/portfolios/{{portfolioId}}/accounts
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
@@ -94,12 +96,13 @@ Content-Type: application/json
 
 ###
 
+# @name searchInstrument
 GET {{Api}}/instruments?search=AAPL
 Authorization: Bearer {{authToken}}
 
 ###
 
-@instrumentId = 6d5e4f3a-2b1c-4a9a-8a9a-9a8b7c6d5e4f
+@instrumentId = {{searchInstrument.response.body.$[0].id}}
 
 GET {{Api}}/instruments/{{instrumentId}}
 Authorization: Bearer {{authToken}}
@@ -146,7 +149,7 @@ Content-Type: application/json
 
 ###
 
-@accountId = 2b1c6a2e-9f9f-4c3c-8b9b-3c4d5e6f7a8b
+@accountId = {{createAccount.response.body.$.id}}
 
 GET {{Api}}/trades?portfolioId={{portfolioId}}
 Authorization: Bearer {{authToken}}
@@ -232,7 +235,31 @@ Authorization: Bearer {{authToken}}
 
 ###
 
-@valuationId = 5e4f3a2b-1c6a-4c6a-8e9f-6d5e4f3a2b1c
+# @name createValuation
+POST {{Api}}/valuations
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "portfolioId": "{{portfolioId}}",
+  "instrumentId": "{{instrumentId}}",
+  "name": "AAPL base case",
+  "estimatedRevenue": "400000000000.00000000",
+  "estimatedNetIncome": "100000000000.00000000",
+  "actualPriorYearRevenue": "383000000000.00000000",
+  "actualPriorYearNetIncome": "97000000000.00000000",
+  "sharesOutstanding": "15200000000.00000000",
+  "revenueGrowthRate": 0.08,
+  "terminalMargin": 0.25,
+  "peMultiple": 28,
+  "currentPrice": "182.50000000",
+  "discountRate": 0.08,
+  "forecastYears": 5
+}
+
+###
+
+@valuationId = {{createValuation.response.body.$.id}}
 
 GET {{Api}}/valuations/{{valuationId}}
 Authorization: Bearer {{authToken}}

@@ -17,6 +17,6 @@ public static class ActivityApi
             .Produces<IReadOnlyList<PortfolioActivityResponse>>();
     }
 
-    private static IResult List(Guid portfolioId, int? limit, ClaimsPrincipal user, IPortfolioActivityService service, CancellationToken cancellationToken)
-        => Results.Ok(new { items = service.List(user.GetUserId(), portfolioId, limit ?? DefaultLimit, cancellationToken) });
+    private static async Task<IResult> List(Guid portfolioId, int? limit, ClaimsPrincipal user, IPortfolioActivityService service, CancellationToken cancellationToken)
+        => Results.Ok(new { items = await service.List(user.GetUserId(), portfolioId, limit ?? DefaultLimit, cancellationToken) });
 }

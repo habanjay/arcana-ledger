@@ -15,12 +15,12 @@ public static class SnapshotsApi
             .Produces<IReadOnlyList<PortfolioSnapshotResponse>>();
     }
 
-    private static IResult List(
+    private static async Task<IResult> List(
         Guid portfolioId,
         DateOnly? from,
         DateOnly? to,
         ClaimsPrincipal user,
         IPortfolioSnapshotService service,
         CancellationToken cancellationToken)
-        => Results.Ok(new { items = service.List(user.GetUserId(), portfolioId, from, to, cancellationToken) });
+        => Results.Ok(new { items = await service.List(user.GetUserId(), portfolioId, from, to, cancellationToken) });
 }
