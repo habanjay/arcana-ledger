@@ -5,9 +5,17 @@ This document is the proposed relational model for the trading dashboard. It is 
 
 ## Implementation status
 
-The current server has no PostgreSQL resource in the Aspire AppHost, no database package, EF Core `DbContext`, migrations, repositories, or domain entities. The React client uses local mock data. The tables and DDL in this document should therefore be treated as the planned persistence contract for a future implementation.
+The server includes an executable PostgreSQL schema script at [schema.sql](../src/ArcanaLedger.Server/Database/schema.sql), applied on demand through Npgsql (ADO.NET). The API continues to use its existing mock services; applying the schema does not switch API persistence or modify the database during ordinary startup.
 
-The DDL targets PostgreSQL 16+ and is intentionally independent of the current mock frontend data. Amounts are stored as `numeric`, never floating point, and timestamps are stored in UTC with `timestamptz`.
+The DDL targets PostgreSQL 16+ and is intentionally independent of the current mock frontend data. Amounts are stored as `numeric`, never floating point, and timestamps are stored in UTC with `timestamptz`. The executable script creates the ERD tables and indexes in a transaction, and defines `set_default_portfolio` for changing a user's default portfolio.
+
+To apply the script, create the target database, set `ConnectionStrings:ArcanaLedger` (or the `ConnectionStrings__ArcanaLedger` environment variable), then run from the repository root:
+
+```powershell
+dotnet run --project src\ArcanaLedger.Server\ArcanaLedger.Server.csproj -- --apply-database-script
+```
+
+This explicit command requires a database role able to create the `citext` and `pgcrypto` extensions. The script uses `IF NOT EXISTS` for tables and indexes, so it can be rerun on a database already created from this schema; it is not a replacement for versioned migrations when the schema evolves.
 
 ## Entity relationship diagram
 
@@ -497,6 +505,32 @@ CREATE TABLE portfolio_settings (
 	momentum_rate numeric(12, 8) CHECK (momentum_rate IS NULL OR momentum_rate >= 0),
 	updated_at timestamptz NOT NULL DEFAULT now()
 );
+
+CREATE OR REPLACE PROCEDURE set_default_portfolio(
+	p_user_id uuid,
+	p_portfolio_id uuid
+)
+LANGUAGE plpgsql
+AS $procedure$
+BEGIN
+	UPDATE portfolios
+	SET is_default = false,
+		updated_at = now()
+	WHERE user_id = p_user_id
+		AND is_default;
+
+	UPDATE portfolios
+	SET is_default = true,
+		updated_at = now()
+	WHERE user_id = p_user_id
+		AND portfolio_id = p_portfolio_id;
+
+	IF NOT FOUND THEN
+		RAISE EXCEPTION 'Portfolio % does not belong to user %', p_portfolio_id, p_user_id
+			USING ERRCODE = '23503';
+	END IF;
+END;
+$procedure$;
 ```
 
 ## Design and performance notes

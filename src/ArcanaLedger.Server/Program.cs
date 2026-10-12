@@ -8,9 +8,27 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.IdentityModel.Tokens;
+using Npgsql;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+if (args.Contains("--apply-database-script", StringComparer.Ordinal))
+{
+    var connectionString = builder.Configuration.GetConnectionString("ArcanaLedger")
+        ?? throw new InvalidOperationException(
+            "Set ConnectionStrings:ArcanaLedger before applying the database script.");
+    var scriptPath = Path.Combine(AppContext.BaseDirectory, "Database", "schema.sql");
+    var script = await File.ReadAllTextAsync(scriptPath);
+
+    await using var connection = new NpgsqlConnection(connectionString);
+    await connection.OpenAsync();
+    await using var command = new NpgsqlCommand(script, connection);
+    await command.ExecuteNonQueryAsync();
+
+    Console.WriteLine("Arcana Ledger database schema applied successfully.");
+    return;
+}
 
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
