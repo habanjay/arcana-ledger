@@ -1,6 +1,279 @@
 @Server_HostAddress = http://localhost:5347
+@Api = {{Server_HostAddress}}/api/v1
 
 GET {{Server_HostAddress}}/api/weatherforecast/
 Accept: application/json
+
+###
+
+# Seeded demo credentials (local/demo use only, see Mocks/MockDataStore.cs).
+# Login first, then the subsequent requests reuse the captured access token.
+
+# @name login
+POST {{Api}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "trader@example.com",
+  "password": "Str0ngPassword!"
+}
+
+###
+
+@authToken = {{login.response.body.$.accessToken}}
+
+POST {{Api}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "new-trader@example.com",
+  "displayName": "New Trader",
+  "password": "AnotherStr0ngPassword!"
+}
+
+###
+
+GET {{Api}}/auth/me
+Authorization: Bearer {{authToken}}
+
+###
+
+POST {{Api}}/auth/logout
+Authorization: Bearer {{authToken}}
+
+###
+
+GET {{Api}}/portfolios
+Authorization: Bearer {{authToken}}
+
+###
+
+@portfolioId = 1e3a3b3e-2f2f-4a9a-8a9a-1a2b3c4d5e6f
+
+GET {{Api}}/portfolios/{{portfolioId}}
+Authorization: Bearer {{authToken}}
+
+###
+
+POST {{Api}}/portfolios
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Growth",
+  "baseCurrency": "CAD",
+  "isDefault": true
+}
+
+###
+
+PATCH {{Api}}/portfolios/{{portfolioId}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Growth (Aggressive)"
+}
+
+###
+
+GET {{Api}}/portfolios/{{portfolioId}}/accounts
+Authorization: Bearer {{authToken}}
+
+###
+
+POST {{Api}}/portfolios/{{portfolioId}}/accounts
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Questrade Margin",
+  "brokerName": "Questrade",
+  "currency": "CAD"
+}
+
+###
+
+GET {{Api}}/instruments?search=AAPL
+Authorization: Bearer {{authToken}}
+
+###
+
+@instrumentId = 6d5e4f3a-2b1c-4a9a-8a9a-9a8b7c6d5e4f
+
+GET {{Api}}/instruments/{{instrumentId}}
+Authorization: Bearer {{authToken}}
+
+###
+
+GET {{Api}}/portfolios/{{portfolioId}}/watchlist
+Authorization: Bearer {{authToken}}
+
+###
+
+POST {{Api}}/portfolios/{{portfolioId}}/watchlist
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "instrumentId": "{{instrumentId}}",
+  "displayOrder": 0
+}
+
+###
+
+GET {{Api}}/trade-setups
+Authorization: Bearer {{authToken}}
+
+###
+
+POST {{Api}}/trade-setups
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "code": "BOOMER",
+  "name": "Boomer",
+  "family": "position",
+  "entryRule": "Breakout above 20-day high with volume confirmation.",
+  "exitRule": "Close below 10-day EMA.",
+  "trend": "up",
+  "usesTranches": true,
+  "trancheCount": 3,
+  "varMultiplier": 1.5,
+  "usageNotes": "Use for high-conviction, longer-duration positions."
+}
+
+###
+
+@accountId = 2b1c6a2e-9f9f-4c3c-8b9b-3c4d5e6f7a8b
+
+GET {{Api}}/trades?portfolioId={{portfolioId}}
+Authorization: Bearer {{authToken}}
+
+###
+
+# @name createTrade
+POST {{Api}}/trades
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "accountId": "{{accountId}}",
+  "instrumentId": "{{instrumentId}}",
+  "orderType": "long",
+  "openedOn": "2026-09-29",
+  "entryTarget": "180.00000000",
+  "cutLoss": "172.00000000",
+  "targetPrice": "205.00000000",
+  "notes": "Breakout setup off the August base."
+}
+
+###
+
+@tradeId = {{createTrade.response.body.$.id}}
+
+GET {{Api}}/trades/{{tradeId}}
+Authorization: Bearer {{authToken}}
+
+###
+
+POST {{Api}}/trades/{{tradeId}}/executions
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "side": "buy",
+  "quantity": "50.00000000",
+  "price": "181.20000000",
+  "commission": "1.99000000",
+  "executedAt": "2026-09-29T14:31:00Z"
+}
+
+###
+
+GET {{Api}}/portfolios/{{portfolioId}}/transactions
+Authorization: Bearer {{authToken}}
+
+###
+
+POST {{Api}}/portfolios/{{portfolioId}}/transactions
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "accountId": "{{accountId}}",
+  "transactionType": "deposit",
+  "cashAmount": "5000.00000000",
+  "currency": "CAD",
+  "occurredAt": "2026-09-29T14:00:00Z",
+  "memo": "Initial funding"
+}
+
+###
+
+GET {{Api}}/portfolios/{{portfolioId}}/snapshots
+Authorization: Bearer {{authToken}}
+
+###
+
+GET {{Api}}/portfolios/{{portfolioId}}/activity?limit=10
+Authorization: Bearer {{authToken}}
+
+###
+
+GET {{Api}}/portfolios/{{portfolioId}}/dashboard
+Authorization: Bearer {{authToken}}
+
+###
+
+GET {{Api}}/valuations
+Authorization: Bearer {{authToken}}
+
+###
+
+@valuationId = 5e4f3a2b-1c6a-4c6a-8e9f-6d5e4f3a2b1c
+
+GET {{Api}}/valuations/{{valuationId}}
+Authorization: Bearer {{authToken}}
+
+###
+
+GET {{Api}}/valuations/{{valuationId}}/forecasts
+Authorization: Bearer {{authToken}}
+
+###
+
+GET {{Api}}/portfolios/{{portfolioId}}/settings
+Authorization: Bearer {{authToken}}
+
+###
+
+PUT {{Api}}/portfolios/{{portfolioId}}/settings
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "capital": "100000.00000000",
+  "varRate": 0.02,
+  "cashValue": "15000.00000000",
+  "reserveValue": "10000.00000000",
+  "positionEntryPrice": "180.00000000",
+  "positionExitPrice": "172.00000000",
+  "positionShares": "50.00000000",
+  "positionCashValue": "9000.00000000",
+  "trancheEntryPrice": "180.00000000",
+  "trancheExitPrice": "172.00000000",
+  "trancheShares": "17.00000000",
+  "trancheCashValue": "3060.00000000",
+  "swingEntryPrice": "180.00000000",
+  "swingExitPrice": "172.00000000",
+  "swingShares": "25.00000000",
+  "swingCashValue": "4500.00000000",
+  "breakoutPrice": "185.00000000",
+  "patternLowPrice": "170.00000000",
+  "swingTargetPrice": "205.00000000",
+  "momentumRate": 0.015
+}
 
 ###
